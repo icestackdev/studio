@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from 'react-hook-form';
@@ -9,6 +10,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { categories } from '@/lib/products';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useState } from 'react';
+import Image from 'next/image';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -16,17 +19,20 @@ const formSchema = z.object({
   price: z.coerce.number().min(0.01, { message: "Price must be greater than 0." }),
   category: z.string().min(1, { message: "Please select a category." }),
   sizes: z.string().min(1, { message: "Please enter at least one size, comma-separated." }),
+  image: z.any().optional(),
 });
 
 type ProductFormValues = z.infer<typeof formSchema>;
 
 interface ProductFormProps {
-  onSubmit: (data: ProductFormValues) => void;
+  onSubmit: (data: ProductFormValues & { imageUrl?: string }) => void;
   onCancel: () => void;
   initialData?: Partial<ProductFormValues>;
 }
 
 export function ProductForm({ onSubmit, onCancel, initialData }: ProductFormProps) {
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData || {
@@ -37,11 +43,25 @@ export function ProductForm({ onSubmit, onCancel, initialData }: ProductFormProp
       sizes: '',
     },
   });
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setImagePreview(null);
+    }
+  };
   
   const handleSubmit = (data: ProductFormValues) => {
     onSubmit({
         ...data,
         sizes: data.sizes.split(',').map(s => s.trim()).filter(s => s),
+        imageUrl: imagePreview || undefined,
     });
   };
 
@@ -123,6 +143,29 @@ export function ProductForm({ onSubmit, onCancel, initialData }: ProductFormProp
             </FormItem>
           )}
         />
+        <FormField
+            control={form.control}
+            name="image"
+            render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Product Image</FormLabel>
+                    <FormControl>
+                        <Input type="file" accept="image/*" onChange={handleImageChange} />
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+            )}
+        />
+
+        {imagePreview && (
+            <div className="mt-4">
+                <FormLabel>Image Preview</FormLabel>
+                <div className="mt-2 w-32 h-32 relative">
+                    <Image src={imagePreview} alt="Image preview" layout="fill" objectFit="cover" className="rounded-md" />
+                </div>
+            </div>
+        )}
+
         <div className="flex justify-end gap-2">
           <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
           <Button type="submit">Save Product</Button>

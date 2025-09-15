@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -7,17 +8,38 @@ import { Button } from '@/components/ui/button';
 import { products } from '@/lib/products';
 import { ProductCard } from '@/components/product-card';
 import { ArrowLeft } from 'lucide-react';
+import type { Product } from '@/lib/types';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export default function ManageProductsPage() {
   const router = useRouter();
   const [isAdding, setIsAdding] = useState(false);
   const [productList, setProductList] = useState(products);
 
-  const handleAddProduct = (data: any) => {
-    const newProduct = {
-      id: `${productList.length + 1}`,
-      ...data,
-      images: [], // Placeholder for images
+  const handleAddProduct = (data: any & { imageUrl?: string }) => {
+    const newProductId = `${productList.length + 1}`;
+    let newImages = [];
+    if(data.imageUrl) {
+        const newImageId = `product-${newProductId}-1`;
+        // This is a temporary solution for local state.
+        // In a real app, you would upload this to a storage service.
+        PlaceHolderImages.push({
+            id: newImageId,
+            description: data.name,
+            imageUrl: data.imageUrl,
+            imageHint: data.name.toLowerCase().split(' ').slice(0,2).join(' '),
+        });
+        newImages.push({ id: newImageId, hint: data.name.toLowerCase() });
+    }
+
+    const newProduct: Product = {
+      id: newProductId,
+      name: data.name,
+      description: data.description,
+      price: data.price,
+      category: data.category,
+      sizes: data.sizes,
+      images: newImages,
     };
     setProductList([newProduct, ...productList]);
     setIsAdding(false);
