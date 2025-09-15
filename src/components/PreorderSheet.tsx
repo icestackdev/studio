@@ -164,10 +164,6 @@ export function PreorderSheet({ open, onOpenChange }: PreorderSheetProps) {
               )}
             />
              <SheetFooter className="gap-2 sm:justify-between pt-2">
-                <Button variant="outline" type="button" onClick={handleAutofill} disabled={isAutofilling} size="sm">
-                    {isAutofilling ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                    AI Autofill
-                </Button>
                 <Button type="submit" disabled={isSubmitting} size="sm">
                     {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Confirm Pre-order
