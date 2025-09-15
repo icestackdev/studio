@@ -9,6 +9,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { motion } from 'framer-motion';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 export default function CategoriesPage() {
   return (
@@ -24,11 +25,14 @@ export default function CategoriesPage() {
       </div>
       
       <Tabs defaultValue={categories[0]} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-            {categories.map(category => (
-                <TabsTrigger key={category} value={category} className="text-xs sm:text-sm">{category}</TabsTrigger>
-            ))}
-        </TabsList>
+        <ScrollArea className="w-full whitespace-nowrap">
+            <TabsList className="inline-flex">
+                {categories.map(category => (
+                    <TabsTrigger key={category} value={category} className="text-xs sm:text-sm">{category}</TabsTrigger>
+                ))}
+            </TabsList>
+            <ScrollBar orientation="horizontal" />
+        </ScrollArea>
         {categories.map(category => (
           <TabsContent key={category} value={category}>
             <div className="grid grid-cols-2 gap-4 pt-4">
