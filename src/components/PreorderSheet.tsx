@@ -1,0 +1,181 @@
+"use client";
+
+import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Loader2, Sparkles } from 'lucide-react';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { useCart } from '@/contexts/CartProvider';
+import { useToast } from '@/hooks/use-toast';
+import { useTelegram } from '@/hooks/useTelegram';
+import { autofillPreorderForm } from '@/ai/flows/autofill-preorder-form';
+
+const formSchema = z.object({
+  name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
+  phone: z.string().min(5, { message: 'Please enter a valid phone number.' }),
+  address: z.string().min(10, { message: 'Please enter a full address.' }),
+  notes: z.string().optional(),
+});
+
+type PreorderFormValues = z.infer<typeof formSchema>;
+
+interface PreorderSheetProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export function PreorderSheet({ open, onOpenChange }: PreorderSheetProps) {
+  const { state, dispatch } = useCart();
+  const { toast } = useToast();
+  const webApp = useTelegram();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAutofilling, setIsAutofilling] = useState(false);
+  
+  const form = useForm<PreorderFormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: '',
+      phone: '',
+      address: '',
+      notes: '',
+    },
+  });
+
+  const handleAutofill = async () => {
+    if (!webApp?.initDataUnsafe) {
+      toast({
+        variant: "destructive",
+        title: "Autofill Failed",
+        description: "Telegram data not available.",
+      });
+      return;
+    }
+    setIsAutofilling(true);
+    try {
+      const result = await autofillPreorderForm({ initDataUnsafe: JSON.stringify(webApp.initDataUnsafe) });
+      if (result) {
+        form.setValue('name', `${result.firstName || ''} ${result.lastName || ''}`.trim());
+        toast({
+          title: "Success",
+          description: "Your name has been pre-filled.",
+        });
+      }
+    } catch (error) {
+      console.error("Autofill error:", error);
+      toast({
+        variant: "destructive",
+        title: "Autofill Error",
+        description: "Could not pre-fill form data.",
+      });
+    } finally {
+      setIsAutofilling(false);
+    }
+  };
+
+  useEffect(() => {
+    if(open && webApp?.initDataUnsafe?.user) {
+        const user = webApp.initDataUnsafe.user;
+        const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim();
+        if(fullName) {
+            form.setValue('name', fullName);
+        }
+    }
+  }, [open, webApp, form]);
+
+  const onSubmit = (data: PreorderFormValues) => {
+    setIsSubmitting(true);
+    dispatch({ type: 'CONFIRM_PRE_ORDER', payload: { customer: data } });
+    setTimeout(() => {
+        toast({
+            title: 'Pre-order Placed!',
+            description: 'Your order has been confirmed. Check your profile for details.',
+        });
+        setIsSubmitting(false);
+        onOpenChange(false);
+    }, 1000);
+  };
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side="bottom" className="rounded-t-lg max-w-lg mx-auto p-4">
+        <SheetHeader>
+          <SheetTitle>Confirm Your Pre-order</SheetTitle>
+          <SheetDescription>
+            Please provide your details to finalize the pre-order.
+          </SheetDescription>
+        </SheetHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Your full name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone Number</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Your phone number" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Shipping Address</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="Your full shipping address" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="notes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Notes (Optional)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Any special instructions?" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <SheetFooter className="gap-2 sm:justify-between">
+                <Button variant="outline" type="button" onClick={handleAutofill} disabled={isAutofilling}>
+                    {isAutofilling ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                    AI Autofill
+                </Button>
+                <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Confirm Pre-order
+                </Button>
+            </SheetFooter>
+          </form>
+        </Form>
+      </SheetContent>
+    </Sheet>
+  );
+}

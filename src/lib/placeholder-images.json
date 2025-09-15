@@ -1,3 +1,88 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "product-1-1",
+      "description": "Front view of a plain white t-shirt on a hanger.",
+      "imageUrl": "https://picsum.photos/seed/101/600/800",
+      "imageHint": "white t-shirt"
+    },
+    {
+      "id": "product-1-2",
+      "description": "A person wearing the white t-shirt in an urban setting.",
+      "imageUrl": "https://picsum.photos/seed/102/600/800",
+      "imageHint": "t-shirt model"
+    },
+    {
+      "id": "product-1-3",
+      "description": "Close-up shot of the cotton fabric of the t-shirt.",
+      "imageUrl": "https://picsum.photos/seed/103/600/800",
+      "imageHint": "fabric detail"
+    },
+    {
+      "id": "product-2-1",
+      "description": "Front view of a black hoodie.",
+      "imageUrl": "https://picsum.photos/seed/201/600/800",
+      "imageHint": "black hoodie"
+    },
+    {
+      "id": "product-2-2",
+      "description": "A person wearing the black hoodie with the hood up.",
+      "imageUrl": "https://picsum.photos/seed/202/600/800",
+      "imageHint": "hoodie model"
+    },
+    {
+      "id": "product-2-3",
+      "description": "Back view of the black hoodie.",
+      "imageUrl": "https://picsum.photos/seed/203/600/800",
+      "imageHint": "hoodie back"
+    },
+    {
+      "id": "product-3-1",
+      "description": "A classic blue denim jacket.",
+      "imageUrl": "https://picsum.photos/seed/301/600/800",
+      "imageHint": "denim jacket"
+    },
+    {
+      "id": "product-3-2",
+      "description": "A person wearing the denim jacket over a white tee.",
+      "imageUrl": "https://picsum.photos/seed/302/600/800",
+      "imageHint": "jacket model"
+    },
+    {
+      "id": "product-4-1",
+      "description": "A pair of khaki slim-fit chinos, folded.",
+      "imageUrl": "https://picsum.photos/seed/401/600/800",
+      "imageHint": "khaki pants"
+    },
+    {
+      "id": "product-4-2",
+      "description": "A person wearing the slim-fit chinos.",
+      "imageUrl": "https://picsum.photos/seed/402/600/800",
+      "imageHint": "pants model"
+    },
+    {
+      "id": "product-5-1",
+      "description": "A grey sweatshirt with a colorful graphic print.",
+      "imageUrl": "https://picsum.photos/seed/501/600/800",
+      "imageHint": "graphic sweatshirt"
+    },
+    {
+      "id": "product-5-2",
+      "description": "Close-up of the graphic design on the sweatshirt.",
+      "imageUrl": "https://picsum.photos/seed/502/600/800",
+      "imageHint": "sweatshirt design"
+    },
+    {
+      "id": "product-6-1",
+      "description": "A long-sleeve shirt with horizontal blue and white stripes.",
+      "imageUrl": "https://picsum.photos/seed/601/600/800",
+      "imageHint": "striped shirt"
+    },
+    {
+      "id": "product-6-2",
+      "description": "Detail of the striped shirt's fabric and stitching.",
+      "imageUrl": "https://picsum.photos/seed/602/600/800",
+      "imageHint": "shirt detail"
+    }
+  ]
 }
