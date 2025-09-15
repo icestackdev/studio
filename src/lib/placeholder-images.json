@@ -1,6 +1,12 @@
 {
   "placeholderImages": [
     {
+      "id": "hero-image",
+      "description": "Stylish person posing in summer clothes.",
+      "imageUrl": "https://picsum.photos/seed/999/800/600",
+      "imageHint": "fashion model"
+    },
+    {
       "id": "product-1-1",
       "description": "Front view of a plain white t-shirt on a hanger.",
       "imageUrl": "https://picsum.photos/seed/101/600/800",
