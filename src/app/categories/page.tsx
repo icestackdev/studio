@@ -32,14 +32,16 @@ export default function CategoriesPage() {
             transition={{ delay: index * 0.1 }}
             className="space-y-4"
           >
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold tracking-tight">{category}</h2>
-               <Link href={`/categories/${category.toLowerCase()}`} passHref>
-                <Button variant="link" className="text-primary pr-0">View All</Button>
-              </Link>
+            <div className="sticky top-16 bg-background/95 backdrop-blur-sm z-10 py-2 -mx-4 px-4">
+                <div className="flex justify-between items-center max-w-lg mx-auto">
+                    <h2 className="text-xl font-bold tracking-tight">{category}</h2>
+                    <Link href={`/categories/${category.toLowerCase()}`} passHref>
+                        <Button variant="link" className="text-primary pr-0">View All</Button>
+                    </Link>
+                </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              {categoryProducts.slice(0, 2).map(product => (
+              {categoryProducts.slice(0, 4).map(product => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
