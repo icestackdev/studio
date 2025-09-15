@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -60,26 +61,31 @@ export default function ProductPage({ params }: { params: { id: string } }) {
       </div>
 
 
-      <div className="p-4 space-y-4">
-        <h1 className="text-2xl font-bold">{product.name}</h1>
-        <p className="text-2xl font-bold text-primary">${product.price.toFixed(2)}</p>
-        <p className="text-muted-foreground text-base">{product.description}</p>
+      <div className="p-4 space-y-6">
+        <div>
+            <h1 className="text-3xl font-bold tracking-tight">{product.name}</h1>
+            <p className="text-muted-foreground text-sm mt-1">{product.category}</p>
+        </div>
+
+        <p className="text-3xl font-bold text-primary">${product.price.toFixed(2)}</p>
         
-        <div className="space-y-3 pt-2">
+        <p className="text-foreground/80 text-base leading-relaxed">{product.description}</p>
+        
+        <div className="space-y-4 pt-2">
           <h3 className="font-semibold text-base">Size</h3>
           <RadioGroup 
             value={selectedSize} 
             onValueChange={setSelectedSize}
-            className="flex flex-wrap gap-2"
+            className="flex flex-wrap gap-3"
           >
             {product.sizes.map(size => (
               <div key={size} className="flex items-center">
                 <RadioGroupItem value={size} id={`size-${size}`} className="sr-only" />
                 <Label
                   htmlFor={`size-${size}`}
-                  className={`border rounded-md px-4 py-2 cursor-pointer transition-colors text-base ${
+                  className={`border rounded-lg px-4 py-2.5 cursor-pointer transition-colors text-base font-medium ${
                     selectedSize === size 
-                    ? 'bg-primary text-primary-foreground border-primary' 
+                    ? 'bg-primary text-primary-foreground border-primary shadow-sm' 
                     : 'bg-background hover:bg-muted'
                   }`}
                 >
@@ -92,10 +98,11 @@ export default function ProductPage({ params }: { params: { id: string } }) {
       </div>
       
       <div className="fixed bottom-16 left-0 right-0 p-4 bg-background/95 backdrop-blur-sm border-t max-w-lg mx-auto z-30">
-        <Button size="lg" className="w-full" onClick={handleAddToCart}>
+        <Button size="lg" className="w-full text-base font-bold py-6 rounded-xl" onClick={handleAddToCart}>
           <ShoppingCart className="mr-2 h-5 w-5" /> Add to Cart
         </Button>
       </div>
     </motion.div>
   );
 }
+
