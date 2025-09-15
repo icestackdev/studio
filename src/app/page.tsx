@@ -17,7 +17,7 @@ export default function HomePage() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="space-y-8"
+      className="space-y-6"
     >
       <div className="relative rounded-xl overflow-hidden h-96 w-full">
         {heroImage && (

@@ -29,7 +29,7 @@ export default function RootLayout({
           <CartProvider>
             <div className="relative max-w-lg mx-auto bg-background min-h-screen flex flex-col shadow-2xl">
               <Header />
-              <main className="flex-1 pt-16 pb-20 px-4">
+              <main className="flex-1 pt-20 pb-20 px-4">
                 {children}
               </main>
               <BottomNav />
