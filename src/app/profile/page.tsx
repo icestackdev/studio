@@ -11,7 +11,7 @@ import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 // Simple mock for admin check
 const ADMIN_USERNAMES = ['tg_username_1', 'your_username', 'telegram_user'];
@@ -19,9 +19,23 @@ const ADMIN_USERNAMES = ['tg_username_1', 'your_username', 'telegram_user'];
 export default function ProfilePage() {
   const webApp = useTelegram();
   const { state } = useCart();
-  const user = webApp?.initDataUnsafe?.user;
+  const [user, setUser] = useState<any>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  
+  useEffect(() => {
+    if (webApp?.initDataUnsafe?.user) {
+      const telegramUser = webApp.initDataUnsafe.user;
+      setUser(telegramUser);
+      setIsAdmin(ADMIN_USERNAMES.includes(telegramUser.username || ''));
+    } else {
+        // For local testing when not in Telegram
+        const mockUser = { first_name: 'Admin', last_name: 'User', username: 'your_username' };
+        setUser(mockUser);
+        setIsAdmin(ADMIN_USERNAMES.includes(mockUser.username));
+    }
+  }, [webApp]);
+
   const reversedOrders = [...state.preOrders].reverse();
-  const [isAdmin] = useState(user && ADMIN_USERNAMES.includes(user.username || 'your_username'));
 
   return (
     <motion.div
