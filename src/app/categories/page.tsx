@@ -19,14 +19,14 @@ export default function CategoriesPage() {
       className="space-y-6"
     >
       <div className="text-center py-4">
-        <h1 className="text-2xl font-bold tracking-tight">Categories</h1>
-        <p className="text-muted-foreground">Find what you're looking for</p>
+        <h1 className="text-xl font-bold tracking-tight">Categories</h1>
+        <p className="text-muted-foreground text-sm">Find what you're looking for</p>
       </div>
       
       <Accordion type="single" collapsible defaultValue={categories[0]} className="w-full">
         {categories.map(category => (
           <AccordionItem key={category} value={category}>
-            <AccordionTrigger className="text-lg font-semibold">{category}</AccordionTrigger>
+            <AccordionTrigger className="text-base font-semibold">{category}</AccordionTrigger>
             <AccordionContent>
               <div className="grid grid-cols-2 gap-4 pt-4">
                 {products

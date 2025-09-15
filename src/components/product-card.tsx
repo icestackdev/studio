@@ -37,8 +37,8 @@ export function ProductCard({ product }: ProductCardProps) {
             )}
           </div>
           <CardContent className="p-3">
-            <h3 className="text-sm font-semibold truncate text-foreground">{product.name}</h3>
-            <p className="text-sm font-bold text-primary">${product.price.toFixed(2)}</p>
+            <h3 className="text-xs font-semibold truncate text-foreground">{product.name}</h3>
+            <p className="text-xs font-bold text-primary">${product.price.toFixed(2)}</p>
           </CardContent>
         </Card>
       </Link>

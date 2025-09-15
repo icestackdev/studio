@@ -34,7 +34,7 @@ export default function ManageProductsPage() {
             <ArrowLeft className="h-5 w-5" />
             <span className="ml-1">Back</span>
         </Button>
-        <h1 className="text-xl font-bold">Manage Products</h1>
+        <h1 className="text-lg font-bold">Manage Products</h1>
       </div>
 
       {isAdding ? (

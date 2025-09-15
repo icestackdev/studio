@@ -53,28 +53,28 @@ export default function ProfilePage() {
           </AvatarFallback>
         </Avatar>
         <div className="text-center">
-          <h1 className="text-xl font-bold">{user ? `${user.first_name} ${user.last_name || ''}` : 'Guest'}</h1>
-          <p className="text-muted-foreground">@{user?.username || 'your_username'}</p>
+          <h1 className="text-lg font-bold">{user ? `${user.first_name} ${user.last_name || ''}` : 'Guest'}</h1>
+          <p className="text-muted-foreground text-sm">@{user?.username || 'your_username'}</p>
         </div>
       </div>
 
        {isAdmin && (
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center text-lg">
+                <CardTitle className="flex items-center text-base">
                     <Settings className="mr-2 h-5 w-5" />
                     Admin Panel
                 </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
                  <Link href="/admin/products" passHref>
-                    <Button variant="outline" className="w-full justify-start">
+                    <Button variant="outline" className="w-full justify-start text-sm">
                         <Package className="mr-2 h-4 w-4" />
                         Manage Products
                     </Button>
                 </Link>
                  <Link href="/admin/orders" passHref>
-                    <Button variant="outline" className="w-full justify-start">
+                    <Button variant="outline" className="w-full justify-start text-sm">
                         <ListOrdered className="mr-2 h-4 w-4" />
                         Manage Orders
                     </Button>
@@ -86,25 +86,25 @@ export default function ProfilePage() {
       <Separator />
 
       <div>
-        <h2 className="text-lg font-semibold mb-4">My Pre-orders</h2>
+        <h2 className="text-base font-semibold mb-4">My Pre-orders</h2>
         {reversedOrders.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground">
             <ShoppingBag className="mx-auto h-12 w-12" />
-            <p className="mt-4">You have no pre-orders yet.</p>
+            <p className="mt-4 text-sm">You have no pre-orders yet.</p>
           </div>
         ) : (
           <div className="space-y-4">
             {reversedOrders.map(order => (
               <Card key={order.id}>
                 <CardHeader>
-                  <CardTitle className="flex justify-between items-center text-base">
+                  <CardTitle className="flex justify-between items-center text-sm">
                     <span>Order {order.id}</span>
                     <Badge variant={order.status === 'Pending' ? 'secondary' : 'default'}>{order.status}</Badge>
                   </CardTitle>
                   <p className="text-xs text-muted-foreground">{format(order.date, 'MMMM d, yyyy')}</p>
                 </CardHeader>
                 <CardContent>
-                  <ul className="text-sm space-y-1">
+                  <ul className="text-xs space-y-1">
                     {order.items.map(item => (
                       <li key={item.id} className="flex justify-between">
                         <span>{item.quantity}x {item.product.name} ({item.size})</span>
@@ -113,7 +113,7 @@ export default function ProfilePage() {
                     ))}
                   </ul>
                   <Separator className="my-2" />
-                  <div className="flex justify-between font-semibold">
+                  <div className="flex justify-between font-semibold text-sm">
                     <span>Total</span>
                     <span>${order.total.toFixed(2)}</span>
                   </div>

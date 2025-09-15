@@ -29,13 +29,13 @@ export default function CartPage() {
         className="space-y-6"
       >
         <div className="text-center py-4">
-          <h1 className="text-2xl font-bold tracking-tight">Your Cart</h1>
+          <h1 className="text-xl font-bold tracking-tight">Your Cart</h1>
         </div>
 
         {state.cartItems.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground">
             <ShoppingBag className="mx-auto h-12 w-12" />
-            <p className="mt-4">Your cart is empty.</p>
+            <p className="mt-4 text-sm">Your cart is empty.</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -61,14 +61,14 @@ export default function CartPage() {
                             </div>
                             <div className="flex-1 flex flex-col justify-between">
                             <div>
-                                <h3 className="font-semibold">{item.product.name}</h3>
-                                <p className="text-sm text-muted-foreground">Size: {item.size}</p>
+                                <h3 className="font-semibold text-sm">{item.product.name}</h3>
+                                <p className="text-xs text-muted-foreground">Size: {item.size}</p>
                                 <p className="font-bold text-sm mt-1">${(item.product.price * item.quantity).toFixed(2)}</p>
                             </div>
                             <div className="flex items-center justify-between mt-2">
                                 <div className="flex items-center gap-2">
                                 <Button size="icon" variant="outline" className="h-7 w-7" onClick={() => handleQuantityChange(item.id, item.quantity - 1)}><Minus className="h-4 w-4" /></Button>
-                                <span className="w-4 text-center">{item.quantity}</span>
+                                <span className="w-4 text-center text-sm">{item.quantity}</span>
                                 <Button size="icon" variant="outline" className="h-7 w-7" onClick={() => handleQuantityChange(item.id, item.quantity + 1)}><Plus className="h-4 w-4" /></Button>
                                 </div>
                                 <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => dispatch({type: 'REMOVE_FROM_CART', payload: {cartItemId: item.id}})}><Trash2 className="h-4 w-4" /></Button>
@@ -81,7 +81,7 @@ export default function CartPage() {
               })}
             </AnimatePresence>
             <div className="pt-4 space-y-4">
-              <div className="flex justify-between font-bold text-lg">
+              <div className="flex justify-between font-bold text-base">
                 <span>Total</span>
                 <span>${total.toFixed(2)}</span>
               </div>

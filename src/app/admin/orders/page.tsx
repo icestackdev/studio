@@ -41,14 +41,14 @@ export default function ManageOrdersPage() {
             <ArrowLeft className="h-5 w-5" />
             <span className="ml-1">Back</span>
         </Button>
-        <h1 className="text-xl font-bold">Manage Orders</h1>
+        <h1 className="text-lg font-bold">Manage Orders</h1>
       </div>
 
       <div className="space-y-4">
         {reversedOrders.map(order => (
           <Card key={order.id}>
             <CardHeader>
-              <CardTitle className="flex justify-between items-center text-base">
+              <CardTitle className="flex justify-between items-center text-sm">
                 <span>Order {order.id}</span>
                 <Badge variant={order.status === 'Pending' ? 'secondary' : 'default'}>{order.status}</Badge>
               </CardTitle>
@@ -58,7 +58,7 @@ export default function ManageOrdersPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <ul className="text-sm space-y-1">
+              <ul className="text-xs space-y-1">
                 {order.items.map(item => (
                   <li key={item.id} className="flex justify-between">
                     <span>{item.quantity}x {item.product.name} ({item.size})</span>
@@ -67,20 +67,20 @@ export default function ManageOrdersPage() {
                 ))}
               </ul>
               <Separator className="my-2" />
-              <div className="flex justify-between font-semibold">
+              <div className="flex justify-between font-semibold text-sm">
                 <span>Total</span>
                 <span>${order.total.toFixed(2)}</span>
               </div>
                <div className="mt-4">
-                <p className="text-sm font-medium mb-2">Update Status</p>
+                <p className="text-xs font-medium mb-2">Update Status</p>
                 <Select onValueChange={(value: PreOrder['status']) => handleStatusChange(order.id, value)} defaultValue={order.status}>
-                  <SelectTrigger>
+                  <SelectTrigger className="text-xs">
                     <SelectValue placeholder="Change status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Pending">Pending</SelectItem>
-                    <SelectItem value="Confirmed">Confirmed</SelectItem>
-                    <SelectItem value="Shipped">Shipped</SelectItem>
+                    <SelectItem value="Pending" className="text-xs">Pending</SelectItem>
+                    <SelectItem value="Confirmed" className="text-xs">Confirmed</SelectItem>
+                    <SelectItem value="Shipped" className="text-xs">Shipped</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -91,4 +91,3 @@ export default function ManageOrdersPage() {
     </div>
   );
 }
-

@@ -61,12 +61,12 @@ export default function ProductPage({ params }: { params: { id: string } }) {
 
 
       <div className="p-4 space-y-4">
-        <h1 className="text-2xl font-bold">{product.name}</h1>
-        <p className="text-2xl font-bold text-primary">${product.price.toFixed(2)}</p>
-        <p className="text-muted-foreground">{product.description}</p>
+        <h1 className="text-xl font-bold">{product.name}</h1>
+        <p className="text-xl font-bold text-primary">${product.price.toFixed(2)}</p>
+        <p className="text-muted-foreground text-sm">{product.description}</p>
         
         <div className="space-y-2">
-          <h3 className="font-semibold">Size</h3>
+          <h3 className="font-semibold text-sm">Size</h3>
           <RadioGroup 
             value={selectedSize} 
             onValueChange={setSelectedSize}
@@ -77,7 +77,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
                 <RadioGroupItem value={size} id={`size-${size}`} className="sr-only" />
                 <Label
                   htmlFor={`size-${size}`}
-                  className={`border rounded-md px-4 py-2 cursor-pointer transition-colors ${
+                  className={`border rounded-md px-4 py-2 cursor-pointer transition-colors text-sm ${
                     selectedSize === size 
                     ? 'bg-accent text-accent-foreground border-accent' 
                     : 'bg-background hover:bg-muted'

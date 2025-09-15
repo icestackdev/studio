@@ -104,8 +104,8 @@ export function PreorderSheet({ open, onOpenChange }: PreorderSheetProps) {
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="rounded-t-lg max-w-lg mx-auto p-4">
         <SheetHeader>
-          <SheetTitle>Confirm Your Pre-order</SheetTitle>
-          <SheetDescription>
+          <SheetTitle className="text-lg">Confirm Your Pre-order</SheetTitle>
+          <SheetDescription className="text-sm">
             Please provide your details to finalize the pre-order.
           </SheetDescription>
         </SheetHeader>
@@ -116,7 +116,7 @@ export function PreorderSheet({ open, onOpenChange }: PreorderSheetProps) {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Full Name</FormLabel>
+                  <FormLabel className="text-sm">Full Name</FormLabel>
                   <FormControl>
                     <Input placeholder="Your full name" {...field} />
                   </FormControl>
@@ -129,7 +129,7 @@ export function PreorderSheet({ open, onOpenChange }: PreorderSheetProps) {
               name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone Number</FormLabel>
+                  <FormLabel className="text-sm">Phone Number</FormLabel>
                   <FormControl>
                     <Input placeholder="Your phone number" {...field} />
                   </FormControl>
@@ -142,7 +142,7 @@ export function PreorderSheet({ open, onOpenChange }: PreorderSheetProps) {
               name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Shipping Address</FormLabel>
+                  <FormLabel className="text-sm">Shipping Address</FormLabel>
                   <FormControl>
                     <Textarea placeholder="Your full shipping address" {...field} />
                   </FormControl>
@@ -155,7 +155,7 @@ export function PreorderSheet({ open, onOpenChange }: PreorderSheetProps) {
               name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Notes (Optional)</FormLabel>
+                  <FormLabel className="text-sm">Notes (Optional)</FormLabel>
                   <FormControl>
                     <Input placeholder="Any special instructions?" {...field} />
                   </FormControl>
@@ -163,12 +163,12 @@ export function PreorderSheet({ open, onOpenChange }: PreorderSheetProps) {
                 </FormItem>
               )}
             />
-             <SheetFooter className="gap-2 sm:justify-between">
-                <Button variant="outline" type="button" onClick={handleAutofill} disabled={isAutofilling}>
+             <SheetFooter className="gap-2 sm:justify-between pt-2">
+                <Button variant="outline" type="button" onClick={handleAutofill} disabled={isAutofilling} size="sm">
                     {isAutofilling ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
                     AI Autofill
                 </Button>
-                <Button type="submit" disabled={isSubmitting}>
+                <Button type="submit" disabled={isSubmitting} size="sm">
                     {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Confirm Pre-order
                 </Button>
