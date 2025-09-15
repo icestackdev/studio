@@ -14,14 +14,14 @@ import Link from 'next/link';
 import { useState } from 'react';
 
 // Simple mock for admin check
-const ADMIN_USERNAMES = ['tg_username_1', 'telegram_user'];
+const ADMIN_USERNAMES = ['tg_username_1', 'your_username', 'telegram_user'];
 
 export default function ProfilePage() {
   const webApp = useTelegram();
   const { state } = useCart();
   const user = webApp?.initDataUnsafe?.user;
   const reversedOrders = [...state.preOrders].reverse();
-  const [isAdmin] = useState(user && ADMIN_USERNAMES.includes(user.username || ''));
+  const [isAdmin] = useState(user && ADMIN_USERNAMES.includes(user.username || 'your_username'));
 
   return (
     <motion.div
@@ -39,7 +39,7 @@ export default function ProfilePage() {
         </Avatar>
         <div className="text-center">
           <h1 className="text-xl font-bold">{user ? `${user.first_name} ${user.last_name || ''}` : 'Guest'}</h1>
-          <p className="text-muted-foreground">@{user?.username || 'telegram_user'}</p>
+          <p className="text-muted-foreground">@{user?.username || 'your_username'}</p>
         </div>
       </div>
 
