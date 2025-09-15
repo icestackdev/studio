@@ -1,16 +1,16 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useCart } from '@/contexts/CartProvider';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { format } from 'date-fns';
+import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 import { Separator } from '@/components/ui/separator';
 import type { PreOrder } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, DollarSign, Package } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function ManageOrdersPage() {
@@ -19,16 +19,39 @@ export default function ManageOrdersPage() {
   const [orders, setOrders] = useState<PreOrder[]>(state.preOrders);
 
   const handleStatusChange = (orderId: string, status: PreOrder['status']) => {
-    // In a real app, you would dispatch an action to update the order status.
-    // For now, we'll just update the local state to simulate this.
     setOrders(orders.map(order => 
       order.id === orderId ? { ...order, status } : order
     ));
-    // Example of a dispatch call you might make:
     // dispatch({ type: 'UPDATE_ORDER_STATUS', payload: { orderId, status } });
   };
   
   const reversedOrders = [...orders].reverse();
+
+  const summaryStats = useMemo(() => {
+    const now = new Date();
+    
+    const weeklyStart = startOfWeek(now);
+    const weeklyEnd = endOfWeek(now);
+    const monthlyStart = startOfMonth(now);
+    const monthlyEnd = endOfMonth(now);
+
+    const weeklyOrders = orders.filter(o => isWithinInterval(o.date, { start: weeklyStart, end: weeklyEnd }));
+    const monthlyOrders = orders.filter(o => isWithinInterval(o.date, { start: monthlyStart, end: monthlyEnd }));
+
+    const weeklyRevenue = weeklyOrders.reduce((acc, order) => acc + order.total, 0);
+    const monthlyRevenue = monthlyOrders.reduce((acc, order) => acc + order.total, 0);
+
+    return {
+      weekly: {
+        revenue: weeklyRevenue,
+        orders: weeklyOrders.length,
+      },
+      monthly: {
+        revenue: monthlyRevenue,
+        orders: monthlyOrders.length,
+      }
+    };
+  }, [orders]);
 
   return (
     <div className="space-y-6">
@@ -43,8 +66,59 @@ export default function ManageOrdersPage() {
         </Button>
         <h1 className="text-lg font-bold">Manage Orders</h1>
       </div>
+      
+      <div className="space-y-2">
+        <h2 className="text-base font-semibold">This Week</h2>
+        <div className="grid gap-4 grid-cols-2">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Weekly Revenue</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">${summaryStats.weekly.revenue.toFixed(2)}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Weekly Orders</CardTitle>
+              <Package className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{summaryStats.weekly.orders}</div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+      
+       <div className="space-y-2">
+        <h2 className="text-base font-semibold">This Month</h2>
+        <div className="grid gap-4 grid-cols-2">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Monthly Revenue</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">${summaryStats.monthly.revenue.toFixed(2)}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Monthly Orders</CardTitle>
+              <Package className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{summaryStats.monthly.orders}</div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      <Separator />
 
       <div className="space-y-4">
+        <h2 className="text-base font-semibold">All Orders</h2>
         {reversedOrders.map(order => (
           <Card key={order.id}>
             <CardHeader>
