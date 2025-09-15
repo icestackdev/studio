@@ -10,13 +10,14 @@ import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isWithinInter
 import { Separator } from '@/components/ui/separator';
 import type { PreOrder } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, DollarSign, Package } from 'lucide-react';
+import { ArrowLeft, Calendar, DollarSign, Package } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function ManageOrdersPage() {
   const { state, dispatch } = useCart();
   const router = useRouter();
   const [orders, setOrders] = useState<PreOrder[]>(state.preOrders);
+  const [period, setPeriod] = useState<'weekly' | 'monthly'>('weekly');
 
   const handleStatusChange = (orderId: string, status: PreOrder['status']) => {
     setOrders(orders.map(order => 
@@ -53,6 +54,11 @@ export default function ManageOrdersPage() {
     };
   }, [orders]);
 
+  const activeSummary = summaryStats[period];
+  const periodLabel = period === 'weekly' ? 'This Week' : 'This Month';
+  const revenueLabel = period === 'weekly' ? 'Weekly Revenue' : 'Monthly Revenue';
+  const ordersLabel = period === 'weekly' ? 'Weekly Orders' : 'Monthly Orders';
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -68,48 +74,36 @@ export default function ManageOrdersPage() {
       </div>
       
       <div className="space-y-2">
-        <h2 className="text-base font-semibold">This Week</h2>
-        <div className="grid gap-4 grid-cols-2">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Weekly Revenue</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">${summaryStats.weekly.revenue.toFixed(2)}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Weekly Orders</CardTitle>
-              <Package className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{summaryStats.weekly.orders}</div>
-            </CardContent>
-          </Card>
+        <div className="flex justify-between items-center">
+          <h2 className="text-base font-semibold">{periodLabel}</h2>
+           <Select onValueChange={(value: 'weekly' | 'monthly') => setPeriod(value)} defaultValue={period}>
+            <SelectTrigger className="w-[140px] text-xs">
+              <Calendar className="mr-2 h-4 w-4" />
+              <SelectValue placeholder="Filter period" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="weekly" className="text-xs">This Week</SelectItem>
+              <SelectItem value="monthly" className="text-xs">This Month</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-      </div>
-      
-       <div className="space-y-2">
-        <h2 className="text-base font-semibold">This Month</h2>
         <div className="grid gap-4 grid-cols-2">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Monthly Revenue</CardTitle>
+              <CardTitle className="text-sm font-medium">{revenueLabel}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">${summaryStats.monthly.revenue.toFixed(2)}</div>
+              <div className="text-2xl font-bold">${activeSummary.revenue.toFixed(2)}</div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Monthly Orders</CardTitle>
+              <CardTitle className="text-sm font-medium">{ordersLabel}</CardTitle>
               <Package className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{summaryStats.monthly.orders}</div>
+              <div className="text-2xl font-bold">{activeSummary.orders}</div>
             </CardContent>
           </Card>
         </div>
