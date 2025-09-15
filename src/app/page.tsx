@@ -69,24 +69,6 @@ export default function HomePage() {
       </Card>
       
       <div>
-        <h2 className="text-2xl font-bold tracking-tight mb-4">Shop by Category</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {categories.map(category => (
-             <Link href="/categories" key={category}>
-                <Card className="group relative overflow-hidden rounded-lg transition-shadow hover:shadow-lg">
-                    <div className="h-24 bg-muted flex items-center justify-center">
-                        <ShoppingBag className="h-8 w-8 text-muted-foreground transition-transform group-hover:scale-110"/>
-                    </div>
-                    <div className="p-3">
-                        <h3 className="font-semibold text-sm text-center">{category}</h3>
-                    </div>
-                </Card>
-            </Link>
-          ))}
-        </div>
-      </div>
-
-      <div>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold tracking-tight">New Arrivals</h2>
           <Link href="/categories" className="text-sm font-medium text-primary hover:underline">
