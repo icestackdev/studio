@@ -1,10 +1,11 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Loader2, Sparkles } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,7 +14,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useCart } from '@/contexts/CartProvider';
 import { useToast } from '@/hooks/use-toast';
 import { useTelegram } from '@/hooks/useTelegram';
-import { autofillPreorderForm } from '@/ai/flows/autofill-preorder-form';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -34,7 +34,6 @@ export function PreorderSheet({ open, onOpenChange }: PreorderSheetProps) {
   const { toast } = useToast();
   const webApp = useTelegram();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isAutofilling, setIsAutofilling] = useState(false);
   
   const form = useForm<PreorderFormValues>({
     resolver: zodResolver(formSchema),
@@ -45,37 +44,6 @@ export function PreorderSheet({ open, onOpenChange }: PreorderSheetProps) {
       notes: '',
     },
   });
-
-  const handleAutofill = async () => {
-    if (!webApp?.initDataUnsafe) {
-      toast({
-        variant: "destructive",
-        title: "Autofill Failed",
-        description: "Telegram data not available.",
-      });
-      return;
-    }
-    setIsAutofilling(true);
-    try {
-      const result = await autofillPreorderForm({ initDataUnsafe: JSON.stringify(webApp.initDataUnsafe) });
-      if (result) {
-        form.setValue('name', `${result.firstName || ''} ${result.lastName || ''}`.trim());
-        toast({
-          title: "Success",
-          description: "Your name has been pre-filled.",
-        });
-      }
-    } catch (error) {
-      console.error("Autofill error:", error);
-      toast({
-        variant: "destructive",
-        title: "Autofill Error",
-        description: "Could not pre-fill form data.",
-      });
-    } finally {
-      setIsAutofilling(false);
-    }
-  };
 
   useEffect(() => {
     if(open && webApp?.initDataUnsafe?.user) {
@@ -163,12 +131,8 @@ export function PreorderSheet({ open, onOpenChange }: PreorderSheetProps) {
                 </FormItem>
               )}
             />
-             <SheetFooter className="gap-2 sm:justify-between pt-2">
-                <Button variant="outline" type="button" onClick={handleAutofill} disabled={isAutofilling} size="sm">
-                    {isAutofilling ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                    AI Autofill
-                </Button>
-                <Button type="submit" disabled={isSubmitting} size="sm">
+             <SheetFooter className="gap-2 sm:justify-end pt-2">
+                <Button type="submit" disabled={isSubmitting} size="sm" className='w-full'>
                     {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Confirm Pre-order
                 </Button>
