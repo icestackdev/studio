@@ -7,21 +7,26 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { User, ShoppingBag, Settings, ListOrdered, Package } from 'lucide-react';
+import { User, ShoppingBag, Settings, ListOrdered, Package, Save } from 'lucide-react';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 // Simple mock for admin check
 const ADMIN_USERNAMES = ['tg_username_1', 'your_username', 'telegram_user'];
 
 export default function ProfilePage() {
   const webApp = useTelegram();
-  const { state } = useCart();
+  const { state, dispatch } = useCart();
+  const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [shopName, setShopName] = useState(state.shopName);
   
   useEffect(() => {
     if (webApp?.initDataUnsafe?.user) {
@@ -35,6 +40,14 @@ export default function ProfilePage() {
         setIsAdmin(ADMIN_USERNAMES.includes(mockUser.username));
     }
   }, [webApp]);
+
+  const handleSaveShopName = () => {
+    dispatch({ type: 'UPDATE_SHOP_NAME', payload: shopName });
+    toast({
+        title: 'Shop Name Updated',
+        description: `The shop name has been changed to "${shopName}".`
+    })
+  };
 
   const reversedOrders = [...state.preOrders].reverse();
 
@@ -66,7 +79,24 @@ export default function ProfilePage() {
                     Admin Panel
                 </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
+            <CardContent className="space-y-4">
+                <div className="space-y-2">
+                    <Label htmlFor="shopName" className="text-sm">Shop Name</Label>
+                    <div className="flex items-center gap-2">
+                        <Input 
+                            id="shopName"
+                            value={shopName} 
+                            onChange={(e) => setShopName(e.target.value)}
+                            className="text-sm"
+                        />
+                        <Button size="icon" onClick={handleSaveShopName}>
+                            <Save className="h-4 w-4" />
+                        </Button>
+                    </div>
+                </div>
+
+                <Separator />
+
                  <Link href="/admin/products" passHref>
                     <Button variant="outline" className="w-full justify-start text-sm">
                         <Package className="mr-2 h-4 w-4" />

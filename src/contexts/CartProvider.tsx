@@ -55,6 +55,7 @@ const sampleOrders: PreOrder[] = [
 interface CartState {
   cartItems: CartItem[];
   preOrders: PreOrder[];
+  shopName: string;
 }
 
 type CartAction =
@@ -63,11 +64,13 @@ type CartAction =
   | { type: 'UPDATE_QUANTITY'; payload: { cartItemId: string; quantity: number } }
   | { type: 'CONFIRM_PRE_ORDER'; payload: { customer: PreOrder['customer'] } }
   | { type: 'UPDATE_ORDER_STATUS'; payload: { orderId: string; status: PreOrder['status'] } }
-  | { type: 'CLEAR_CART' };
+  | { type: 'CLEAR_CART' }
+  | { type: 'UPDATE_SHOP_NAME'; payload: string };
 
 const initialState: CartState = {
   cartItems: [],
   preOrders: sampleOrders,
+  shopName: 'ThreadLine',
 };
 
 const CartContext = createContext<{
@@ -147,6 +150,12 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
                 ? { ...order, status: action.payload.status } 
                 : order
             )
+        };
+    }
+    case 'UPDATE_SHOP_NAME': {
+        return {
+            ...state,
+            shopName: action.payload,
         };
     }
     default:
