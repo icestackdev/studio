@@ -51,11 +51,11 @@ export default function ProductPage({ params }: { params: { id: string } }) {
         <ProductImages product={product} />
         <Button 
             variant="ghost" 
-            size="icon" 
-            className="absolute top-4 left-4 rounded-full bg-background/60 hover:bg-background/80 backdrop-blur-sm"
+            className="absolute top-4 left-4 rounded-full bg-background/60 hover:bg-background/80 backdrop-blur-sm h-auto"
             onClick={() => router.back()}
         >
             <ArrowLeft className="h-5 w-5" />
+            <span className="ml-1">Back</span>
         </Button>
       </div>
 
