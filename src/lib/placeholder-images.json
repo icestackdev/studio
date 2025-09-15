@@ -7,6 +7,12 @@
       "imageHint": "fashion collage"
     },
     {
+      "id": "promo-banner-1",
+      "description": "A person wearing a light summer outfit against a bright, airy background.",
+      "imageUrl": "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=600&h=400&fit=crop",
+      "imageHint": "summer fashion"
+    },
+    {
       "id": "product-1-1",
       "description": "A black leather jacket hanging against a minimalist background.",
       "imageUrl": "https://images.unsplash.com/photo-1521223890158-f9f7c3d5d504?q=80&w=600&h=800&fit=crop",
