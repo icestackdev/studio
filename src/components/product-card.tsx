@@ -11,7 +11,9 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const primaryImage = PlaceHolderImages.find(img => img.id === product.images[0].id);
+  const primaryImage = product.images && product.images.length > 0
+    ? PlaceHolderImages.find(img => img.id === product.images[0].id)
+    : null;
 
   return (
     <motion.div
