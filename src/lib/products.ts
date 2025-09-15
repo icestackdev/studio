@@ -33,8 +33,8 @@ export const products: Product[] = [
     description: 'A versatile wardrobe staple. Our Denim Jacket is crafted from durable denim with a slightly worn-in look.',
     price: 129.99,
     images: [
-      { id: 'product-3-1', hint: 'denim jacket' },
-      { id: 'product-3-2', hint: 'jacket model' },
+      { id: 'product-5-1', hint: 'denim jacket' },
+      { id: 'product-5-2', hint: 'jacket model' },
     ],
     sizes: ['M', 'L', 'XL'],
     category: 'Jackets',
