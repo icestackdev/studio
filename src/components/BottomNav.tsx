@@ -22,7 +22,7 @@ export function BottomNav() {
     <nav className="fixed bottom-0 left-0 right-0 h-16 bg-background/80 backdrop-blur-sm border-t z-40 max-w-lg mx-auto">
       <div className="grid grid-cols-4 h-full">
         {navItems.map((item) => {
-          const isActive = (pathname === '/' && item.href === '/') || (pathname !== '/' && pathname.startsWith(item.href));
+          const isActive = pathname === item.href;
           return (
             <Link
               key={item.href}
