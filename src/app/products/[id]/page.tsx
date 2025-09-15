@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { notFound } from 'next/navigation';
+import { notFound, useRouter } from 'next/navigation';
 import { products } from '@/lib/products';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartProvider';
@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { ProductImages } from '@/components/product-images';
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function ProductPage({ params }: { params: { id: string } }) {
@@ -17,6 +17,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   const [quantity] = useState(1);
   const { dispatch } = useCart();
   const { toast } = useToast();
+  const router = useRouter();
 
   const product = products.find(p => p.id === params.id);
 
@@ -46,7 +47,18 @@ export default function ProductPage({ params }: { params: { id: string } }) {
       transition={{ duration: 0.5 }}
       className="pb-24"
     >
-      <ProductImages product={product} />
+      <div className="relative">
+        <ProductImages product={product} />
+        <Button 
+            variant="ghost" 
+            size="icon" 
+            className="absolute top-4 left-4 rounded-full bg-background/60 hover:bg-background/80 backdrop-blur-sm"
+            onClick={() => router.back()}
+        >
+            <ArrowLeft className="h-5 w-5" />
+        </Button>
+      </div>
+
 
       <div className="p-4 space-y-4">
         <h1 className="text-2xl font-bold">{product.name}</h1>
