@@ -2,6 +2,40 @@
 
 import React, { createContext, useReducer, useContext, ReactNode } from 'react';
 import type { CartItem, PreOrder, Product } from '@/lib/types';
+import { products } from '@/lib/products';
+
+const sampleOrders: PreOrder[] = [
+    {
+        id: 'PO-1672532400000',
+        items: [
+            { id: '1-M-1672532400000', product: products.find(p => p.id === '1')!, size: 'M', quantity: 1 },
+            { id: '2-L-1672532400000', product: products.find(p => p.id === '2')!, size: 'L', quantity: 1 },
+        ],
+        customer: {
+            name: 'Jane Doe',
+            phone: '123-456-7890',
+            address: '123 Main St, Anytown, USA',
+        },
+        total: 339.98,
+        date: new Date('2023-01-01T10:00:00Z'),
+        status: 'Shipped',
+    },
+    {
+        id: 'PO-1675209600000',
+        items: [
+            { id: '3-L-1675209600000', product: products.find(p => p.id === '3')!, size: 'L', quantity: 2 },
+        ],
+        customer: {
+            name: 'John Smith',
+            phone: '098-765-4321',
+            address: '456 Oak Ave, Someville, USA',
+        },
+        total: 259.98,
+        date: new Date('2023-02-01T12:00:00Z'),
+        status: 'Confirmed',
+    },
+];
+
 
 interface CartState {
   cartItems: CartItem[];
@@ -17,7 +51,7 @@ type CartAction =
 
 const initialState: CartState = {
   cartItems: [],
-  preOrders: [],
+  preOrders: sampleOrders,
 };
 
 const CartContext = createContext<{
