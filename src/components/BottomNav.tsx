@@ -29,7 +29,7 @@ export function BottomNav() {
               href={item.href}
               className={cn(
                 'flex flex-col items-center justify-center gap-1 text-xs transition-colors',
-                isActive ? 'text-primary-foreground font-semibold' : 'text-muted-foreground'
+                isActive ? 'text-accent font-semibold' : 'text-muted-foreground hover:text-foreground'
               )}
             >
               <div className="relative">

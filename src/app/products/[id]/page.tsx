@@ -50,7 +50,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
 
       <div className="p-4 space-y-4">
         <h1 className="text-2xl font-bold">{product.name}</h1>
-        <p className="text-2xl font-bold text-primary-foreground">${product.price.toFixed(2)}</p>
+        <p className="text-2xl font-bold text-primary">${product.price.toFixed(2)}</p>
         <p className="text-muted-foreground">{product.description}</p>
         
         <div className="space-y-2">
@@ -67,8 +67,8 @@ export default function ProductPage({ params }: { params: { id: string } }) {
                   htmlFor={`size-${size}`}
                   className={`border rounded-md px-4 py-2 cursor-pointer transition-colors ${
                     selectedSize === size 
-                    ? 'bg-primary text-primary-foreground border-primary' 
-                    : 'bg-background hover:bg-accent/50'
+                    ? 'bg-accent text-accent-foreground border-accent' 
+                    : 'bg-background hover:bg-muted'
                   }`}
                 >
                   {size}
@@ -80,7 +80,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
       </div>
       
       <div className="fixed bottom-16 left-0 right-0 p-4 bg-background/80 backdrop-blur-sm border-t max-w-lg mx-auto z-30">
-        <Button size="lg" className="w-full" onClick={handleAddToCart}>
+        <Button size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" onClick={handleAddToCart}>
           <ShoppingCart className="mr-2 h-5 w-5" /> Add to Cart
         </Button>
       </div>
