@@ -16,20 +16,22 @@ export default function ManageProductsPage() {
   const [isAdding, setIsAdding] = useState(false);
   const [productList, setProductList] = useState(products);
 
-  const handleAddProduct = (data: any & { imageUrl?: string }) => {
+  const handleAddProduct = (data: any & { imageUrls?: string[] }) => {
     const newProductId = `${productList.length + 1}`;
     let newImages = [];
-    if(data.imageUrl) {
-        const newImageId = `product-${newProductId}-1`;
-        // This is a temporary solution for local state.
-        // In a real app, you would upload this to a storage service.
-        PlaceHolderImages.push({
-            id: newImageId,
-            description: data.name,
-            imageUrl: data.imageUrl,
-            imageHint: data.name.toLowerCase().split(' ').slice(0,2).join(' '),
+    if(data.imageUrls && data.imageUrls.length > 0) {
+        newImages = data.imageUrls.map((imageUrl: string, index: number) => {
+            const newImageId = `product-${newProductId}-${index + 1}`;
+            // This is a temporary solution for local state.
+            // In a real app, you would upload this to a storage service.
+            PlaceHolderImages.push({
+                id: newImageId,
+                description: data.name,
+                imageUrl: imageUrl,
+                imageHint: data.name.toLowerCase().split(' ').slice(0,2).join(' '),
+            });
+            return { id: newImageId, hint: data.name.toLowerCase() };
         });
-        newImages.push({ id: newImageId, hint: data.name.toLowerCase() });
     }
 
     const newProduct: Product = {

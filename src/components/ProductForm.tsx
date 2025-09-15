@@ -19,19 +19,21 @@ const formSchema = z.object({
   price: z.coerce.number().min(0.01, { message: "Price must be greater than 0." }),
   category: z.string().min(1, { message: "Please select a category." }),
   sizes: z.string().min(1, { message: "Please enter at least one size, comma-separated." }),
-  image: z.any().optional(),
+  image1: z.any().optional(),
+  image2: z.any().optional(),
+  image3: z.any().optional(),
 });
 
 type ProductFormValues = z.infer<typeof formSchema>;
 
 interface ProductFormProps {
-  onSubmit: (data: ProductFormValues & { imageUrl?: string }) => void;
+  onSubmit: (data: ProductFormValues & { imageUrls?: string[] }) => void;
   onCancel: () => void;
   initialData?: Partial<ProductFormValues>;
 }
 
 export function ProductForm({ onSubmit, onCancel, initialData }: ProductFormProps) {
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imagePreviews, setImagePreviews] = useState<(string | null)[]>([null, null, null]);
   
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(formSchema),
@@ -44,16 +46,20 @@ export function ProductForm({ onSubmit, onCancel, initialData }: ProductFormProp
     },
   });
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result as string);
+        const newPreviews = [...imagePreviews];
+        newPreviews[index] = reader.result as string;
+        setImagePreviews(newPreviews);
       };
       reader.readAsDataURL(file);
     } else {
-      setImagePreview(null);
+      const newPreviews = [...imagePreviews];
+      newPreviews[index] = null;
+      setImagePreviews(newPreviews);
     }
   };
   
@@ -61,7 +67,7 @@ export function ProductForm({ onSubmit, onCancel, initialData }: ProductFormProp
     onSubmit({
         ...data,
         sizes: data.sizes.split(',').map(s => s.trim()).filter(s => s),
-        imageUrl: imagePreview || undefined,
+        imageUrls: imagePreviews.filter((url): url is string => url !== null),
     });
   };
 
@@ -143,30 +149,41 @@ export function ProductForm({ onSubmit, onCancel, initialData }: ProductFormProp
             </FormItem>
           )}
         />
-        <FormField
-            control={form.control}
-            name="image"
-            render={({ field }) => (
-                <FormItem>
-                    <FormLabel>Product Image</FormLabel>
-                    <FormControl>
-                        <Input type="file" accept="image/*" onChange={handleImageChange} />
-                    </FormControl>
-                    <FormMessage />
-                </FormItem>
-            )}
-        />
+        
+        <div className="space-y-4">
+            <FormLabel>Product Images</FormLabel>
+            {[...Array(3)].map((_, index) => (
+                <FormField
+                    key={index}
+                    control={form.control}
+                    name={`image${index + 1}` as 'image1' | 'image2' | 'image3'}
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel className="text-xs">Image {index + 1}</FormLabel>
+                            <FormControl>
+                                <Input type="file" accept="image/*" onChange={(e) => handleImageChange(e, index)} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            ))}
+        </div>
 
-        {imagePreview && (
-            <div className="mt-4">
-                <FormLabel>Image Preview</FormLabel>
-                <div className="mt-2 w-32 h-32 relative">
-                    <Image src={imagePreview} alt="Image preview" layout="fill" objectFit="cover" className="rounded-md" />
-                </div>
-            </div>
-        )}
+        <div className="flex gap-4 mt-4">
+            {imagePreviews.map((preview, index) => (
+                preview && (
+                    <div key={index} className="mt-2">
+                        <FormLabel className="text-xs">Preview {index + 1}</FormLabel>
+                        <div className="mt-2 w-24 h-24 relative">
+                            <Image src={preview} alt={`Image preview ${index + 1}`} layout="fill" objectFit="cover" className="rounded-md" />
+                        </div>
+                    </div>
+                )
+            ))}
+        </div>
 
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-2 pt-4">
           <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
           <Button type="submit">Save Product</Button>
         </div>
