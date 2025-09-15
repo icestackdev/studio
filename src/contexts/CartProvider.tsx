@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { createContext, useReducer, useContext, ReactNode } from 'react';
@@ -34,6 +35,20 @@ const sampleOrders: PreOrder[] = [
         date: new Date('2023-02-01T12:00:00Z'),
         status: 'Confirmed',
     },
+     {
+        id: 'PO-1677628800000',
+        items: [
+            { id: '4-32-1677628800000', product: products.find(p => p.id === '4')!, size: '32', quantity: 1 },
+        ],
+        customer: {
+            name: 'Emily White',
+            phone: '555-555-5555',
+            address: '789 Pine Ln, Otherplace, USA',
+        },
+        total: 79.99,
+        date: new Date('2023-03-01T12:00:00Z'),
+        status: 'Pending',
+    },
 ];
 
 
@@ -47,6 +62,7 @@ type CartAction =
   | { type: 'REMOVE_FROM_CART'; payload: { cartItemId: string } }
   | { type: 'UPDATE_QUANTITY'; payload: { cartItemId: string; quantity: number } }
   | { type: 'CONFIRM_PRE_ORDER'; payload: { customer: PreOrder['customer'] } }
+  | { type: 'UPDATE_ORDER_STATUS'; payload: { orderId: string; status: PreOrder['status'] } }
   | { type: 'CLEAR_CART' };
 
 const initialState: CartState = {
@@ -122,6 +138,16 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
         cartItems: [],
         preOrders: [...state.preOrders, newPreOrder],
       };
+    }
+    case 'UPDATE_ORDER_STATUS': {
+        return {
+            ...state,
+            preOrders: state.preOrders.map(order => 
+                order.id === action.payload.orderId 
+                ? { ...order, status: action.payload.status } 
+                : order
+            )
+        };
     }
     default:
       return state;

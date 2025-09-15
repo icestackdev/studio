@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useTelegram } from '@/hooks/useTelegram';
@@ -6,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { User, ShoppingBag, Settings } from 'lucide-react';
+import { User, ShoppingBag, Settings, ListOrdered, Package } from 'lucide-react';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -58,12 +59,28 @@ export default function ProfilePage() {
       </div>
 
        {isAdmin && (
-        <Link href="/admin/products" passHref>
-          <Button className="w-full">
-            <Settings className="mr-2 h-4 w-4" />
-            Manage Products
-          </Button>
-        </Link>
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center text-lg">
+                    <Settings className="mr-2 h-5 w-5" />
+                    Admin Panel
+                </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+                 <Link href="/admin/products" passHref>
+                    <Button variant="outline" className="w-full justify-start">
+                        <Package className="mr-2 h-4 w-4" />
+                        Manage Products
+                    </Button>
+                </Link>
+                 <Link href="/admin/orders" passHref>
+                    <Button variant="outline" className="w-full justify-start">
+                        <ListOrdered className="mr-2 h-4 w-4" />
+                        Manage Orders
+                    </Button>
+                </Link>
+            </CardContent>
+        </Card>
       )}
 
       <Separator />
