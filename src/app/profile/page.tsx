@@ -14,7 +14,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 
 // Simple mock for admin check
-const ADMIN_USERNAMES = ['tg_username_1', 'your_admin_username'];
+const ADMIN_USERNAMES = ['tg_username_1', 'telegram_user'];
 
 export default function ProfilePage() {
   const webApp = useTelegram();
