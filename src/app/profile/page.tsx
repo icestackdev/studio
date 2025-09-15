@@ -52,7 +52,7 @@ export default function ProfilePage() {
     >
       <div className="flex flex-col items-center space-y-2 py-4">
         <Avatar className="h-20 w-20">
-          <AvatarImage src={`https://t.me/i/userpic/320/${user?.username}.jpg`} />
+          <AvatarImage src={``} />
           <AvatarFallback>
             <User className="h-10 w-10" />
           </AvatarFallback>
