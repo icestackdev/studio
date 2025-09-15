@@ -26,12 +26,15 @@ export default function ProfilePage() {
   const [shopName, setShopName] = useState(state.shopName);
   
   useEffect(() => {
-    // For testing, everyone is an admin.
-    setIsAdmin(true);
-    // For local testing when not in Telegram
-    const mockUser = { first_name: 'Test', last_name: 'User', username: 'test_user' };
-    setUser(mockUser);
-  }, []);
+    setIsAdmin(true); // All users are admins as requested
+    if (webApp?.initDataUnsafe?.user) {
+      setUser(webApp.initDataUnsafe.user);
+    } else {
+      // Fallback for when not in Telegram
+      const mockUser = { first_name: 'Guest', last_name: 'User', username: 'guest_user' };
+      setUser(mockUser);
+    }
+  }, [webApp]);
 
   const handleSaveShopName = () => {
     dispatch({ type: 'UPDATE_SHOP_NAME', payload: shopName });
