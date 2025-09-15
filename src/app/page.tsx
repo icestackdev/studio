@@ -1,7 +1,7 @@
 "use client";
 
 import { ProductCard } from '@/components/product-card';
-import { products, categories } from '@/lib/products';
+import { products } from '@/lib/products';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -19,7 +19,7 @@ export default function HomePage() {
       transition={{ duration: 0.5 }}
       className="space-y-8"
     >
-      <div className="relative rounded-lg overflow-hidden h-80 w-full">
+      <div className="relative rounded-xl overflow-hidden h-96 w-full">
         {heroImage && (
              <Image 
                 src={heroImage.imageUrl} 
@@ -29,21 +29,41 @@ export default function HomePage() {
                 data-ai-hint={heroImage.imageHint}
              />
         )}
-        <div className="absolute inset-0 bg-black/40 flex flex-col items-start justify-end p-6">
-            <h1 className="text-3xl font-bold tracking-tight text-white">Summer Collection</h1>
-            <p className="text-lg text-white/90 mt-2">Fresh looks for the new season.</p>
-            <Link href="/categories">
-                <Button className="mt-4" variant="secondary">
-                    Shop Now <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-            </Link>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-black/10 flex flex-col items-center justify-center text-center p-6">
+            <motion.h1 
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="text-4xl font-extrabold tracking-tight text-white drop-shadow-lg"
+            >
+              New Season Arrivals
+            </motion.h1>
+            <motion.p 
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+              className="text-xl text-white/90 mt-4 max-w-md drop-shadow-md"
+            >
+              Discover the latest trends and refresh your wardrobe.
+            </motion.p>
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
+            >
+              <Link href="/categories">
+                  <Button className="mt-6" size="lg" variant="secondary">
+                      Explore Collection <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+              </Link>
+            </motion.div>
         </div>
       </div>
 
       <div>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold tracking-tight">Featured Products</h2>
-          <Link href="/categories" className="text-sm font-medium text-accent hover:underline">
+          <Link href="/categories" className="text-sm font-medium text-primary hover:underline">
             View All
           </Link>
         </div>
