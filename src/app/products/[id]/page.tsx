@@ -52,11 +52,11 @@ export default function ProductPage({ params }: { params: { id: string } }) {
         <ProductImages product={product} />
         <Button 
             variant="ghost" 
-            className="absolute top-4 left-4 rounded-full bg-background/60 hover:bg-background/80 backdrop-blur-sm h-auto p-2"
+            className="absolute top-4 left-4 rounded-full bg-background/60 hover:bg-background/80 backdrop-blur-sm h-auto"
             onClick={() => router.back()}
         >
             <ArrowLeft className="h-5 w-5" />
-            <span className="sr-only">Back</span>
+            <span className="ml-1">Back</span>
         </Button>
       </div>
 
@@ -105,4 +105,5 @@ export default function ProductPage({ params }: { params: { id: string } }) {
     </motion.div>
   );
 }
+
 
