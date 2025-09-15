@@ -89,6 +89,42 @@
       "description": "Detail shot of the buttons and collar of a shirt.",
       "imageUrl": "https://images.unsplash.com/photo-1596755094514-7e724d0847c4?q=80&w=600&h=800&fit=crop",
       "imageHint": "shirt detail"
+    },
+    {
+      "id": "product-7-1",
+      "description": "A beautiful floral sundress hanging on a clothes rack.",
+      "imageUrl": "https://images.unsplash.com/photo-1595507028-2524de315f60?q=80&w=600&h=800&fit=crop",
+      "imageHint": "floral sundress"
+    },
+    {
+      "id": "product-7-2",
+      "description": "A model wearing the floral sundress in a sunny garden.",
+      "imageUrl": "https://images.unsplash.com/photo-1589138672045-385075191c94?q=80&w=600&h=800&fit=crop",
+      "imageHint": "sundress model"
+    },
+    {
+      "id": "product-8-1",
+      "description": "A pair of classic high-waisted blue jeans.",
+      "imageUrl": "https://images.unsplash.com/photo-1602293589922-181a33930960?q=80&w=600&h=800&fit=crop",
+      "imageHint": "high-waisted jeans"
+    },
+    {
+      "id": "product-8-2",
+      "description": "A model showing off the fit of the high-waisted jeans.",
+      "imageUrl": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=600&h=800&fit=crop",
+      "imageHint": "jeans model"
+    },
+    {
+      "id": "product-9-1",
+      "description": "A pair of stylish brown leather boots.",
+      "imageUrl": "https://images.unsplash.com/photo-1608256246200-53e6357b43b9?q=80&w=600&h=800&fit=crop",
+      "imageHint": "leather boots"
+    },
+    {
+      "id": "product-9-2",
+      "description": "A person wearing the leather boots in an autumn setting.",
+      "imageUrl": "https://images.unsplash.com/photo-1518049362265-d5b2a6467637?q=80&w=600&h=800&fit=crop",
+      "imageHint": "boots model"
     }
   ]
 }

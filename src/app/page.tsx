@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { ArrowRight } from 'lucide-react';
 
 export default function HomePage() {
@@ -42,11 +43,14 @@ export default function HomePage() {
       </div>
 
       <Tabs defaultValue={categories[0]} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-            {categories.map((category) => (
-                <TabsTrigger key={category} value={category}>{category}</TabsTrigger>
-            ))}
-        </TabsList>
+        <ScrollArea>
+            <TabsList>
+                {categories.map((category) => (
+                    <TabsTrigger key={category} value={category}>{category}</TabsTrigger>
+                ))}
+            </TabsList>
+            <ScrollBar orientation="horizontal" />
+        </ScrollArea>
         {categories.map((category) => (
             <TabsContent key={category} value={category}>
                  <div className="grid grid-cols-2 gap-4 pt-4">

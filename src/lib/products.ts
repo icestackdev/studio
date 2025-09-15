@@ -75,6 +75,42 @@ export const products: Product[] = [
     sizes: ['S', 'M', 'L'],
     category: 'Shirts',
   },
+  {
+    id: '7',
+    name: 'Floral Sundress',
+    description: 'Light and airy, this floral sundress is perfect for sunny days. Features a flattering A-line cut.',
+    price: 95.00,
+    images: [
+      { id: 'product-7-1', hint: 'floral sundress' },
+      { id: 'product-7-2', hint: 'sundress model' },
+    ],
+    sizes: ['S', 'M', 'L'],
+    category: 'Dresses',
+  },
+  {
+    id: '8',
+    name: 'High-Waisted Jeans',
+    description: 'Classic high-waisted jeans with a modern skinny fit. Made with stretch denim for all-day comfort.',
+    price: 110.00,
+    images: [
+      { id: 'product-8-1', hint: 'high-waisted jeans' },
+      { id: 'product-8-2', hint: 'jeans model' },
+    ],
+    sizes: ['26', '28', '30', '32'],
+    category: 'Jeans',
+  },
+  {
+    id: '9',
+    name: 'Leather Boots',
+    description: 'Handcrafted leather boots that combine style and durability. A versatile addition to any wardrobe.',
+    price: 180.00,
+    images: [
+      { id: 'product-9-1', hint: 'leather boots' },
+      { id: 'product-9-2', hint: 'boots model' },
+    ],
+    sizes: ['7', '8', '9', '10', '11'],
+    category: 'Shoes',
+  },
 ];
 
 export const categories = [...new Set(products.map((p) => p.category))];
