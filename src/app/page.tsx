@@ -7,8 +7,6 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { ArrowRight } from 'lucide-react';
 
 export default function HomePage() {
@@ -42,27 +40,19 @@ export default function HomePage() {
         </div>
       </div>
 
-      <Tabs defaultValue={categories[0]} className="w-full">
-        <ScrollArea>
-            <TabsList>
-                {categories.map((category) => (
-                    <TabsTrigger key={category} value={category}>{category}</TabsTrigger>
-                ))}
-            </TabsList>
-            <ScrollBar orientation="horizontal" />
-        </ScrollArea>
-        {categories.map((category) => (
-            <TabsContent key={category} value={category}>
-                 <div className="grid grid-cols-2 gap-4 pt-4">
-                    {products
-                        .filter((p) => p.category === category)
-                        .map((product) => (
-                        <ProductCard key={product.id} product={product} />
-                        ))}
-                </div>
-            </TabsContent>
-        ))}
-      </Tabs>
+      <div>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold tracking-tight">Featured Products</h2>
+          <Link href="/categories" className="text-sm font-medium text-accent hover:underline">
+            View All
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          {products.slice(0, 4).map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      </div>
     </motion.div>
   );
 }
