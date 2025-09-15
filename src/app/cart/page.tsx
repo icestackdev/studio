@@ -29,13 +29,13 @@ export default function CartPage() {
         className="space-y-6"
       >
         <div className="text-center py-4">
-          <h1 className="text-xl font-bold tracking-tight">Your Cart</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Your Cart</h1>
         </div>
 
         {state.cartItems.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground">
-            <ShoppingBag className="mx-auto h-12 w-12" />
-            <p className="mt-4 text-sm">Your cart is empty.</p>
+            <ShoppingBag className="mx-auto h-16 w-16" />
+            <p className="mt-4 text-base">Your cart is empty.</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -52,26 +52,26 @@ export default function CartPage() {
                     >
                         <Card className="overflow-hidden">
                         <CardContent className="p-4 flex gap-4">
-                            <div className="w-[80px] h-[100px] bg-muted rounded-md flex items-center justify-center shrink-0">
+                            <div className="w-24 h-32 bg-muted rounded-md flex items-center justify-center shrink-0">
                               {image ? (
-                                <Image src={image.imageUrl} alt={item.product.name} width={80} height={100} className="rounded-md object-cover w-full h-full" data-ai-hint={image.imageHint} />
+                                <Image src={image.imageUrl} alt={item.product.name} width={96} height={128} className="rounded-md object-cover w-full h-full" data-ai-hint={image.imageHint} />
                               ) : (
                                 <ImageIcon className="w-8 h-8 text-muted-foreground" />
                               )}
                             </div>
-                            <div className="flex-1 flex flex-col justify-between">
+                            <div className="flex-1 flex flex-col justify-between py-1">
                             <div>
-                                <h3 className="font-semibold text-sm">{item.product.name}</h3>
-                                <p className="text-xs text-muted-foreground">Size: {item.size}</p>
-                                <p className="font-bold text-sm mt-1">${(item.product.price * item.quantity).toFixed(2)}</p>
+                                <h3 className="font-semibold text-base">{item.product.name}</h3>
+                                <p className="text-sm text-muted-foreground">Size: {item.size}</p>
+                                <p className="font-bold text-base mt-1">${(item.product.price * item.quantity).toFixed(2)}</p>
                             </div>
                             <div className="flex items-center justify-between mt-2">
                                 <div className="flex items-center gap-2">
-                                <Button size="icon" variant="outline" className="h-7 w-7" onClick={() => handleQuantityChange(item.id, item.quantity - 1)}><Minus className="h-4 w-4" /></Button>
-                                <span className="w-4 text-center text-sm">{item.quantity}</span>
-                                <Button size="icon" variant="outline" className="h-7 w-7" onClick={() => handleQuantityChange(item.id, item.quantity + 1)}><Plus className="h-4 w-4" /></Button>
+                                <Button size="icon" variant="outline" className="h-8 w-8" onClick={() => handleQuantityChange(item.id, item.quantity - 1)}><Minus className="h-4 w-4" /></Button>
+                                <span className="w-5 text-center text-base font-medium">{item.quantity}</span>
+                                <Button size="icon" variant="outline" className="h-8 w-8" onClick={() => handleQuantityChange(item.id, item.quantity + 1)}><Plus className="h-4 w-4" /></Button>
                                 </div>
-                                <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => dispatch({type: 'REMOVE_FROM_CART', payload: {cartItemId: item.id}})}><Trash2 className="h-4 w-4" /></Button>
+                                <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => dispatch({type: 'REMOVE_FROM_CART', payload: {cartItemId: item.id}})}><Trash2 className="h-5 w-5" /></Button>
                             </div>
                             </div>
                         </CardContent>
@@ -81,11 +81,11 @@ export default function CartPage() {
               })}
             </AnimatePresence>
             <div className="pt-4 space-y-4">
-              <div className="flex justify-between font-bold text-base">
+              <div className="flex justify-between font-bold text-lg">
                 <span>Total</span>
                 <span>${total.toFixed(2)}</span>
               </div>
-              <Button className="w-full bg-accent text-accent-foreground hover:bg-accent/90" size="lg" onClick={() => setIsSheetOpen(true)}>
+              <Button className="w-full" size="lg" onClick={() => setIsSheetOpen(true)}>
                 Place Pre-order
               </Button>
             </div>

@@ -23,15 +23,15 @@ export function ProductCard({ product }: ProductCardProps) {
       whileHover={{ y: -5 }}
     >
       <Link href={`/products/${product.id}`}>
-        <Card className="w-full overflow-hidden transition-shadow hover:shadow-lg bg-card border-transparent">
-          <div className="w-full h-auto object-cover aspect-[3/4] rounded-t-lg bg-muted flex items-center justify-center">
+        <Card className="w-full overflow-hidden transition-shadow hover:shadow-lg bg-card group">
+          <div className="w-full h-auto object-cover aspect-[3/4] rounded-t-lg bg-muted flex items-center justify-center overflow-hidden">
             {primaryImage ? (
               <Image
                 src={primaryImage.imageUrl}
                 alt={product.name}
                 width={600}
                 height={800}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 data-ai-hint={primaryImage.imageHint}
               />
             ) : (
@@ -39,8 +39,8 @@ export function ProductCard({ product }: ProductCardProps) {
             )}
           </div>
           <CardContent className="p-3">
-            <h3 className="text-xs font-semibold truncate text-foreground">{product.name}</h3>
-            <p className="text-xs font-bold text-primary">${product.price.toFixed(2)}</p>
+            <h3 className="text-sm font-semibold truncate text-foreground">{product.name}</h3>
+            <p className="text-sm font-bold text-primary">${product.price.toFixed(2)}</p>
           </CardContent>
         </Card>
       </Link>

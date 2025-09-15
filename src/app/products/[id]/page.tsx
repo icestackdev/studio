@@ -51,22 +51,22 @@ export default function ProductPage({ params }: { params: { id: string } }) {
         <ProductImages product={product} />
         <Button 
             variant="ghost" 
-            className="absolute top-4 left-4 rounded-full bg-background/60 hover:bg-background/80 backdrop-blur-sm h-auto"
+            className="absolute top-4 left-4 rounded-full bg-background/60 hover:bg-background/80 backdrop-blur-sm h-auto p-2"
             onClick={() => router.back()}
         >
             <ArrowLeft className="h-5 w-5" />
-            <span className="ml-1">Back</span>
+            <span className="sr-only">Back</span>
         </Button>
       </div>
 
 
       <div className="p-4 space-y-4">
-        <h1 className="text-xl font-bold">{product.name}</h1>
-        <p className="text-xl font-bold text-primary">${product.price.toFixed(2)}</p>
-        <p className="text-muted-foreground text-sm">{product.description}</p>
+        <h1 className="text-2xl font-bold">{product.name}</h1>
+        <p className="text-2xl font-bold text-primary">${product.price.toFixed(2)}</p>
+        <p className="text-muted-foreground text-base">{product.description}</p>
         
-        <div className="space-y-2">
-          <h3 className="font-semibold text-sm">Size</h3>
+        <div className="space-y-3 pt-2">
+          <h3 className="font-semibold text-base">Size</h3>
           <RadioGroup 
             value={selectedSize} 
             onValueChange={setSelectedSize}
@@ -77,9 +77,9 @@ export default function ProductPage({ params }: { params: { id: string } }) {
                 <RadioGroupItem value={size} id={`size-${size}`} className="sr-only" />
                 <Label
                   htmlFor={`size-${size}`}
-                  className={`border rounded-md px-4 py-2 cursor-pointer transition-colors text-sm ${
+                  className={`border rounded-md px-4 py-2 cursor-pointer transition-colors text-base ${
                     selectedSize === size 
-                    ? 'bg-accent text-accent-foreground border-accent' 
+                    ? 'bg-primary text-primary-foreground border-primary' 
                     : 'bg-background hover:bg-muted'
                   }`}
                 >
@@ -91,8 +91,8 @@ export default function ProductPage({ params }: { params: { id: string } }) {
         </div>
       </div>
       
-      <div className="fixed bottom-16 left-0 right-0 p-4 bg-background/80 backdrop-blur-sm border-t max-w-lg mx-auto z-30">
-        <Button size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" onClick={handleAddToCart}>
+      <div className="fixed bottom-16 left-0 right-0 p-4 bg-background/95 backdrop-blur-sm border-t max-w-lg mx-auto z-30">
+        <Button size="lg" className="w-full" onClick={handleAddToCart}>
           <ShoppingCart className="mr-2 h-5 w-5" /> Add to Cart
         </Button>
       </div>

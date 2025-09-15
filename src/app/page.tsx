@@ -17,9 +17,9 @@ export default function HomePage() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="space-y-6"
+      className="space-y-8"
     >
-      <div className="relative rounded-xl overflow-hidden h-80 w-full">
+      <div className="relative rounded-xl overflow-hidden h-96 w-full">
         {heroImage && (
              <Image 
                 src={heroImage.imageUrl} 
@@ -27,14 +27,16 @@ export default function HomePage() {
                 fill
                 className="object-cover"
                 data-ai-hint={heroImage.imageHint}
+                priority
              />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col items-start justify-end p-6">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6">
             <motion.h1 
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
-              className="text-3xl font-extrabold tracking-tight text-white drop-shadow-lg"
+              className="text-4xl font-extrabold tracking-tight text-white drop-shadow-lg"
             >
               New Season Arrivals
             </motion.h1>
@@ -42,7 +44,7 @@ export default function HomePage() {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.5 }}
-              className="text-base text-white/90 mt-2 max-w-md drop-shadow-md"
+              className="text-lg text-white/90 mt-4 max-w-md drop-shadow-md"
             >
               Discover the latest trends and refresh your wardrobe.
             </motion.p>
@@ -52,7 +54,7 @@ export default function HomePage() {
               transition={{ delay: 0.4, duration: 0.5 }}
             >
               <Link href="/categories">
-                  <Button className="mt-4" size="lg" variant="secondary">
+                  <Button className="mt-6" size="lg">
                       Explore Collection <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
               </Link>
@@ -62,7 +64,7 @@ export default function HomePage() {
 
       <div>
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold tracking-tight">Featured Products</h2>
+          <h2 className="text-2xl font-bold tracking-tight">Featured</h2>
           <Link href="/categories" className="text-sm font-medium text-primary hover:underline">
             View All
           </Link>
