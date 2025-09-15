@@ -6,15 +6,22 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { User, ShoppingBag } from 'lucide-react';
+import { User, ShoppingBag, Settings } from 'lucide-react';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { useState } from 'react';
+
+// Simple mock for admin check
+const ADMIN_USERNAMES = ['tg_username_1', 'your_admin_username'];
 
 export default function ProfilePage() {
   const webApp = useTelegram();
   const { state } = useCart();
   const user = webApp?.initDataUnsafe?.user;
   const reversedOrders = [...state.preOrders].reverse();
+  const [isAdmin] = useState(user && ADMIN_USERNAMES.includes(user.username || ''));
 
   return (
     <motion.div
@@ -35,6 +42,15 @@ export default function ProfilePage() {
           <p className="text-muted-foreground">@{user?.username || 'telegram_user'}</p>
         </div>
       </div>
+
+       {isAdmin && (
+        <Link href="/admin/products" passHref>
+          <Button className="w-full">
+            <Settings className="mr-2 h-4 w-4" />
+            Manage Products
+          </Button>
+        </Link>
+      )}
 
       <Separator />
 
