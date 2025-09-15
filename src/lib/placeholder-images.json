@@ -3,91 +3,91 @@
     {
       "id": "hero-image",
       "description": "A stylish collage of fashion models in various chic outfits, conveying a sense of trendiness and variety.",
-      "imageUrl": "https://picsum.photos/seed/hero-fashion/800/600",
+      "imageUrl": "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800&h=600&fit=crop",
       "imageHint": "fashion collage"
     },
     {
       "id": "product-1-1",
       "description": "A black leather jacket hanging against a minimalist background.",
-      "imageUrl": "https://picsum.photos/seed/leather-jacket-front/600/800",
+      "imageUrl": "https://images.unsplash.com/photo-1521223890158-f9f7c3d5d504?q=80&w=600&h=800&fit=crop",
       "imageHint": "leather jacket"
     },
     {
       "id": "product-1-2",
       "description": "A model wearing a leather jacket in an urban night setting.",
-      "imageUrl": "https://picsum.photos/seed/leather-jacket-model/600/800",
+      "imageUrl": "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=600&h=800&fit=crop",
       "imageHint": "jacket model"
     },
     {
       "id": "product-1-3",
       "description": "A close-up of the leather jacket's texture and silver zipper details.",
-      "imageUrl": "https://picsum.photos/seed/leather-jacket-detail/600/800",
+      "imageUrl": "https://images.unsplash.com/photo-1611312449412-6cefac5dc2b4?q=80&w=600&h=800&fit=crop",
       "imageHint": "jacket detail"
     },
     {
       "id": "product-2-1",
       "description": "A cream-colored wool sweater neatly folded.",
-      "imageUrl": "https://picsum.photos/seed/wool-sweater-folded/600/800",
+      "imageUrl": "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?q=80&w=600&h=800&fit=crop",
       "imageHint": "wool sweater"
     },
     {
       "id": "product-2-2",
       "description": "A person wearing a cozy wool sweater while holding a cup of coffee.",
-      "imageUrl": "https://picsum.photos/seed/wool-sweater-model/600/800",
+      "imageUrl": "https://images.unsplash.com/photo-1612423284934-2850a4ea6b0f?q=80&w=600&h=800&fit=crop",
       "imageHint": "sweater model"
     },
     {
       "id": "product-2-3",
       "description": "A view of the back of the wool sweater, showing its knit pattern.",
-      "imageUrl": "https://picsum.photos/seed/wool-sweater-back/600/800",
+      "imageUrl": "https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?q=80&w=600&h=800&fit=crop",
       "imageHint": "sweater back"
     },
     {
       "id": "product-3-1",
       "description": "A classic blue denim jacket on a hanger.",
-      "imageUrl": "https://picsum.photos/seed/denim-jacket-front/600/800",
+      "imageUrl": "https://images.unsplash.com/photo-1548883354-94bcfe321c25?q=80&w=600&h=800&fit=crop",
       "imageHint": "denim jacket"
     },
     {
       "id": "product-3-2",
       "description": "A person with their back turned, wearing a denim jacket with a cool patch.",
-      "imageUrl": "https://picsum.photos/seed/denim-jacket-model/600/800",
+      "imageUrl": "https://images.unsplash.com/photo-1525442344-9f03913a804d?q=80&w=600&h=800&fit=crop",
       "imageHint": "jacket model"
     },
     {
       "id": "product-4-1",
       "description": "A pair of beige linen trousers folded neatly.",
-      "imageUrl": "https://picsum.photos/seed/linen-trousers-folded/600/800",
+      "imageUrl": "https://images.unsplash.com/photo-1604176354204-9268737828e4?q=80&w=600&h=800&fit=crop",
       "imageHint": "linen trousers"
     },
     {
       "id": "product-4-2",
       "description": "A model walking on a beach wearing linen trousers.",
-      "imageUrl": "https://picsum.photos/seed/linen-trousers-model/600/800",
+      "imageUrl": "https://images.unsplash.com/photo-1542272604-787c38556f68?q=80&w=600&h=800&fit=crop",
       "imageHint": "trousers model"
     },
     {
       "id": "product-5-1",
       "description": "A heather grey crewneck sweatshirt on a plain background.",
-      "imageUrl": "https://picsum.photos/seed/crewneck-sweatshirt/600/800",
+      "imageUrl": "https://images.unsplash.com/photo-1582855584825-78c005b452d3?q=80&w=600&h=800&fit=crop",
       "imageHint": "crewneck sweatshirt"
     },
     {
       "id": "product-5-2",
       "description": "A close-up of the soft fabric of the crewneck sweatshirt.",
-      "imageUrl": "https://picsum.photos/seed/crewneck-fabric/600/800",
+      "imageUrl": "https://images.unsplash.com/photo-1622615294211-cda32087236d?q=80&w=600&h=800&fit=crop",
       "imageHint": "sweatshirt fabric"
     },
     {
       "id": "product-6-1",
       "description": "A crisp white button-down shirt.",
-      "imageUrl": "https://picsum.photos/seed/button-down-shirt/600/800",
+      "imageUrl": "https://images.unsplash.com/photo-1603252109303-2751441dd157?q=80&w=600&h=800&fit=crop",
       "imageHint": "button-down shirt"
     },
     {
       "id": "product-6-2",
       "description": "Detail shot of the buttons and collar of a shirt.",
-      "imageUrl": "https://picsum.photos/seed/shirt-detail-new/600/800",
+      "imageUrl": "https://images.unsplash.com/photo-1596755094514-7e724d0847c4?q=80&w=600&h=800&fit=crop",
       "imageHint": "shirt detail"
     }
   ]
