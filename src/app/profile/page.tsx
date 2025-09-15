@@ -17,9 +17,6 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
-// Simple mock for admin check
-const ADMIN_USERNAMES = ['tg_username_1', 'your_username', 'telegram_user'];
-
 export default function ProfilePage() {
   const webApp = useTelegram();
   const { state, dispatch } = useCart();
@@ -29,15 +26,15 @@ export default function ProfilePage() {
   const [shopName, setShopName] = useState(state.shopName);
   
   useEffect(() => {
+    // For testing, everyone is an admin.
+    setIsAdmin(true);
     if (webApp?.initDataUnsafe?.user) {
       const telegramUser = webApp.initDataUnsafe.user;
       setUser(telegramUser);
-      setIsAdmin(ADMIN_USERNAMES.includes(telegramUser.username || ''));
     } else {
         // For local testing when not in Telegram
-        const mockUser = { first_name: 'Admin', last_name: 'User', username: 'your_username' };
+        const mockUser = { first_name: 'Test', last_name: 'User', username: 'test_user' };
         setUser(mockUser);
-        setIsAdmin(ADMIN_USERNAMES.includes(mockUser.username));
     }
   }, [webApp]);
 
