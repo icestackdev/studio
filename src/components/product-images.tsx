@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import type { Product } from '@/lib/types';
+import { ImageIcon } from 'lucide-react';
 
 interface ProductImagesProps {
   product: Product;
@@ -12,6 +13,16 @@ interface ProductImagesProps {
 
 export function ProductImages({ product }: ProductImagesProps) {
   const images = product.images.map(img => PlaceHolderImages.find(pImg => pImg.id === img.id)).filter(Boolean);
+
+  if (images.length === 0) {
+    return (
+        <Card className="overflow-hidden">
+            <CardContent className="p-0 flex items-center justify-center bg-muted aspect-[3/4]">
+                <ImageIcon className="w-24 h-24 text-muted-foreground" />
+            </CardContent>
+        </Card>
+    )
+  }
 
   return (
     <Carousel className="w-full">
