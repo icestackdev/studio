@@ -29,7 +29,7 @@ export default function HomePage() {
                 data-ai-hint={heroImage.imageHint}
              />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-black/10 flex flex-col items-center justify-center text-center p-6">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex flex-col items-start justify-end p-6">
             <motion.h1 
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -42,7 +42,7 @@ export default function HomePage() {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.5 }}
-              className="text-xl text-white/90 mt-4 max-w-md drop-shadow-md"
+              className="text-lg text-white/90 mt-2 max-w-md drop-shadow-md"
             >
               Discover the latest trends and refresh your wardrobe.
             </motion.p>
@@ -52,7 +52,7 @@ export default function HomePage() {
               transition={{ delay: 0.4, duration: 0.5 }}
             >
               <Link href="/categories">
-                  <Button className="mt-6" size="lg" variant="secondary">
+                  <Button className="mt-4" size="lg" variant="secondary">
                       Explore Collection <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
               </Link>
