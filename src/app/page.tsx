@@ -19,58 +19,54 @@ export default function HomePage() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="space-y-12"
+      className="space-y-8"
     >
-      <Card className="overflow-hidden bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
-        <div className="flex flex-col md:flex-row items-center">
-            <div className="p-8 md:w-1/2 space-y-4">
-                <motion.h1 
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.2, duration: 0.5 }}
-                  className="text-3xl font-bold tracking-tight text-foreground"
-                >
-                  Summer Collection is Here
-                </motion.h1>
-                <motion.p 
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.3, duration: 0.5 }}
-                  className="text-base text-muted-foreground"
-                >
-                  Light, airy, and ready for sunshine. Discover our new arrivals.
-                </motion.p>
-                <motion.div
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.4, duration: 0.5 }}
-                >
-                  <Link href="/categories">
-                      <Button className="mt-4" size="lg">
-                          Shop Now <ArrowRight className="ml-2 h-5 w-5" />
-                      </Button>
-                  </Link>
-                </motion.div>
-            </div>
-             <div className="md:w-1/2 h-64 md:h-auto">
-                {promoImage && (
-                    <Image
-                        src={promoImage.imageUrl}
-                        alt="Summer Collection"
-                        width={600}
-                        height={400}
-                        className="object-cover h-full w-full"
-                        data-ai-hint={promoImage.imageHint}
-                        priority
-                    />
-                )}
-            </div>
+      <div className="relative rounded-lg overflow-hidden h-64">
+        {promoImage && (
+            <Image
+                src={promoImage.imageUrl}
+                alt="Summer Collection"
+                fill
+                className="object-cover w-full h-full"
+                data-ai-hint={promoImage.imageHint}
+                priority
+            />
+        )}
+        <div className="absolute inset-0 bg-black/40" />
+        <div className="absolute inset-0 flex flex-col items-start justify-end p-6 space-y-2">
+            <motion.h1 
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="text-2xl font-bold tracking-tight text-white"
+            >
+              Summer Collection
+            </motion.h1>
+            <motion.p 
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+              className="text-sm text-white/90 max-w-xs"
+            >
+              Light, airy, and ready for sunshine. Discover our new arrivals.
+            </motion.p>
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
+            >
+              <Link href="/categories">
+                  <Button className="mt-2" variant="secondary" size="sm">
+                      Shop Now <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+              </Link>
+            </motion.div>
         </div>
-      </Card>
+      </div>
       
       <div>
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold tracking-tight">New Arrivals</h2>
+          <h2 className="text-xl font-bold tracking-tight">New Arrivals</h2>
           <Link href="/categories" className="text-sm font-medium text-primary hover:underline">
             View All
           </Link>
