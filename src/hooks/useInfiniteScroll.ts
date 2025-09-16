@@ -19,31 +19,33 @@ export function useInfiniteScroll<T>({
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const observer = useRef<IntersectionObserver>();
+  const isFetching = useRef(false);
   const isInitialLoad = useRef(true);
 
   const loadMore = useCallback(async (isInitial = false) => {
-    if (isLoading || !hasMore) return;
-    if (!isInitial && isInitialLoad.current) return;
+    if (isFetching.current || !hasMore) return;
 
-
+    isFetching.current = true;
     setIsLoading(true);
+
     try {
       const newItems = await fetchFunction({ page, limit });
-      setItems(prevItems => [...prevItems, ...newItems]);
+      setItems(prevItems => isInitial ? newItems : [...prevItems, ...newItems]);
       setPage(prevPage => prevPage + 1);
       setHasMore(newItems.length === limit);
-      if(isInitial) {
-        isInitialLoad.current = false;
-      }
     } catch (error) {
       console.error("Failed to fetch more items", error);
     } finally {
+      isFetching.current = false;
       setIsLoading(false);
+      if (isInitial) {
+        isInitialLoad.current = false;
+      }
     }
-  }, [fetchFunction, page, limit, isLoading, hasMore]);
+  }, [fetchFunction, page, limit, hasMore]);
 
   const lastItemRef = useCallback(node => {
-    if (isLoading) return;
+    if (isFetching.current) return;
     if (observer.current) observer.current.disconnect();
     
     observer.current = new IntersectionObserver(entries => {
@@ -53,19 +55,22 @@ export function useInfiniteScroll<T>({
     });
 
     if (node) observer.current.observe(node);
-  }, [isLoading, hasMore, loadMore]);
+  }, [hasMore, loadMore]);
   
   const reset = useCallback(() => {
+    isInitialLoad.current = true;
     setItems([]);
-    setPage(1);
+    setPage(initialPage);
     setHasMore(true);
     setIsLoading(false);
-    isInitialLoad.current = true;
+    isFetching.current = false;
     loadMore(true);
-  }, [loadMore]);
+  }, [loadMore, initialPage]);
 
   useEffect(() => {
-    loadMore(true);
+    if (isInitialLoad.current) {
+        loadMore(true);
+    }
   }, []);
 
   return { items, lastItemRef, hasMore, isLoading, reset };
