@@ -17,7 +17,9 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { getOrders } from '@/app/actions/order';
-import type { PreOrder } from '@/lib/types';
+import type { Order, OrderItem, Product as PrismaProduct, Category } from '@prisma/client';
+
+type OrderWithItems = Order & { items: (OrderItem & { product: PrismaProduct })[] };
 
 export default function ProfilePage() {
   const webApp = useTelegram();
@@ -26,7 +28,7 @@ export default function ProfilePage() {
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [shopName, setShopName] = useState(state.shopName);
-  const [myOrders, setMyOrders] = useState<PreOrder[]>([]);
+  const [myOrders, setMyOrders] = useState<any[]>([]);
 
   
   useEffect(() => {
@@ -45,10 +47,10 @@ export default function ProfilePage() {
     // In a real app, you would filter orders by user ID.
     const fetchMyOrders = async () => {
         const allOrders = await getOrders();
-        setMyOrders(allOrders as PreOrder[]);
+        setMyOrders(allOrders);
     };
     fetchMyOrders();
-  }, [state.preOrders]);
+  }, []);
 
   const handleSaveShopName = () => {
     dispatch({ type: 'UPDATE_SHOP_NAME', payload: shopName });
@@ -152,10 +154,10 @@ export default function ProfilePage() {
                 </CardHeader>
                 <CardContent>
                   <ul className="text-xs space-y-1">
-                    {order.items.map(item => (
+                    {order.items.map((item: any) => (
                       <li key={item.id} className="flex justify-between">
                         <span>{item.quantity}x {item.product.name} ({item.size})</span>
-                        <span>${(item.product.price * item.quantity).toFixed(2)}</span>
+                        <span>${(item.price * item.quantity).toFixed(2)}</span>
                       </li>
                     ))}
                   </ul>
