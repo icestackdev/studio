@@ -153,7 +153,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
                 categories: categories.map(c => c.name),
                 orders: orders as PreOrder[],
                 shopName: shopNameSetting?.value || 'ThreadLine',
-                deliveryFee: deliveryFeeSetting ? parseFloat(deliveryFeeSetting.value) : 0,
+                deliveryFee: deliveryFeeSetting?.value ? parseFloat(deliveryFeeSetting.value) : 5,
             } });
         } catch (error) {
             console.error("Failed to fetch initial data", error);
