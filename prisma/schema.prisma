@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
@@ -10,23 +11,26 @@ datasource db {
   url      = "file:./dev.db"
 }
 
-model Settings {
-  key   String @id
-  value String
-}
-
 model Product {
-  id          String         @id @default(cuid())
-  name        String         @unique
+  id          String   @id @default(cuid())
+  name        String   @unique
   description String
   price       Float
   images      ProductImage[]
   sizes       String[]
-  category    Category       @relation(fields: [categoryId], references: [id])
+  category    Category @relation(fields: [categoryId], references: [id])
   categoryId  String
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   OrderItem   OrderItem[]
+}
+
+model Category {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  products Product[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model ProductImage {
@@ -37,24 +41,16 @@ model ProductImage {
   createdAt DateTime @default(now())
 }
 
-model Category {
-  id        String    @id @default(cuid())
-  name      String    @unique
-  products  Product[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-}
-
 model Order {
   id              String      @id @default(cuid())
   customerName    String
   customerPhone   String
   customerAddress String
   customerNotes   String?
-  items           OrderItem[]
   total           Float
-  deliveryFee     Float       @default(0)
-  status          String      // e.g., 'Pending', 'Confirmed', 'Shipped'
+  deliveryFee     Float
+  status          String // e.g., "Pending", "Confirmed", "Shipped"
+  items           OrderItem[]
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 }
@@ -66,7 +62,15 @@ model OrderItem {
   product   Product  @relation(fields: [productId], references: [id])
   productId String
   quantity  Int
-  price     Float // price at the time of order
+  price     Float
   size      String
   createdAt DateTime @default(now())
+}
+
+model Settings {
+  id      String @id @default(cuid())
+  key     String @unique
+  value   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
