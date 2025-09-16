@@ -3,14 +3,14 @@
 
 import React, { createContext, useReducer, useContext, ReactNode } from 'react';
 import type { CartItem, PreOrder, Product } from '@/lib/types';
-import { products, categories as initialCategories } from '@/lib/products';
+import { products as initialProducts, categories as initialCategories } from '@/lib/products';
 
 const sampleOrders: PreOrder[] = [
     {
         id: 'PO-1672532400000',
         items: [
-            { id: '1-M-1672532400000', product: products.find(p => p.id === '1')!, size: 'M', quantity: 1 },
-            { id: '2-L-1672532400000', product: products.find(p => p.id === '2')!, size: 'L', quantity: 1 },
+            { id: '1-M-1672532400000', product: initialProducts.find(p => p.id === '1')!, size: 'M', quantity: 1 },
+            { id: '2-L-1672532400000', product: initialProducts.find(p => p.id === '2')!, size: 'L', quantity: 1 },
         ],
         customer: {
             name: 'Jane Doe',
@@ -24,7 +24,7 @@ const sampleOrders: PreOrder[] = [
     {
         id: 'PO-1675209600000',
         items: [
-            { id: '3-L-1675209600000', product: products.find(p => p.id === '3')!, size: 'L', quantity: 2 },
+            { id: '3-L-1675209600000', product: initialProducts.find(p => p.id === '3')!, size: 'L', quantity: 2 },
         ],
         customer: {
             name: 'John Smith',
@@ -38,7 +38,7 @@ const sampleOrders: PreOrder[] = [
      {
         id: 'PO-1677628800000',
         items: [
-            { id: '4-32-1677628800000', product: products.find(p => p.id === '4')!, size: '32', quantity: 1 },
+            { id: '4-32-1677628800000', product: initialProducts.find(p => p.id === '4')!, size: '32', quantity: 1 },
         ],
         customer: {
             name: 'Emily White',
@@ -57,6 +57,7 @@ interface CartState {
   preOrders: PreOrder[];
   shopName: string;
   categories: string[];
+  products: Product[];
 }
 
 type CartAction =
@@ -68,13 +69,15 @@ type CartAction =
   | { type: 'CLEAR_CART' }
   | { type: 'UPDATE_SHOP_NAME'; payload: string }
   | { type: 'ADD_CATEGORY'; payload: string }
-  | { type: 'DELETE_CATEGORY'; payload: string };
+  | { type: 'DELETE_CATEGORY'; payload: string }
+  | { type: 'EDIT_CATEGORY'; payload: { oldName: string; newName: string } };
 
 const initialState: CartState = {
   cartItems: [],
   preOrders: sampleOrders,
   shopName: 'ThreadLine',
   categories: initialCategories,
+  products: initialProducts,
 };
 
 const CartContext = createContext<{
@@ -173,6 +176,16 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
       return {
         ...state,
         categories: state.categories.filter(cat => cat !== action.payload)
+      };
+    }
+    case 'EDIT_CATEGORY': {
+      const { oldName, newName } = action.payload;
+      if (state.categories.includes(newName)) return state;
+      
+      return {
+        ...state,
+        categories: state.categories.map(c => c === oldName ? newName : c),
+        products: state.products.map(p => p.category === oldName ? { ...p, category: newName } : p)
       };
     }
     default:

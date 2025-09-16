@@ -1,7 +1,6 @@
 
 'use client';
 
-import { products } from '@/lib/products';
 import { ProductCard } from '@/components/product-card';
 import { ProductListItem } from '@/components/product-list-item';
 import { motion } from 'framer-motion';
@@ -14,7 +13,7 @@ import { useCart } from '@/contexts/CartProvider';
 export default function CategoriesPage() {
   const [layout, setLayout] = useState<'grid' | 'list'>('list');
   const { state } = useCart();
-  const { categories } = state;
+  const { categories, products } = state;
 
   return (
     <motion.div
@@ -46,7 +45,7 @@ export default function CategoriesPage() {
             <div className="sticky top-16 bg-background/95 backdrop-blur-sm z-10 py-2 -mx-4 px-4">
                 <div className="flex justify-between items-center max-w-lg mx-auto">
                     <h2 className="text-xl font-bold tracking-tight">{category}</h2>
-                    <Link href={`/categories/${category.toLowerCase()}`} passHref>
+                    <Link href={`/categories/${encodeURIComponent(category.toLowerCase().replace(/ /g, '-'))}`} passHref>
                         <Button variant="link" className="text-primary pr-0">View All</Button>
                     </Link>
                 </div>

@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ProductForm } from '@/components/ProductForm';
 import { Button } from '@/components/ui/button';
-import { products } from '@/lib/products';
+import { useCart } from '@/contexts/CartProvider';
 import { ProductCard } from '@/components/product-card';
 import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
 import type { Product } from '@/lib/types';
@@ -24,9 +24,10 @@ import {
 
 export default function ManageProductsPage() {
   const router = useRouter();
+  const { state } = useCart();
   const [isAdding, setIsAdding] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [productList, setProductList] = useState(products);
+  const [productList, setProductList] = useState(state.products);
 
   const handleAddProduct = (data: any & { imageUrls?: string[] }) => {
     const newProductId = `${productList.length + 1}`;

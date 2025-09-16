@@ -3,9 +3,8 @@
 
 import { useState } from 'react';
 import { notFound, useRouter } from 'next/navigation';
-import { products } from '@/lib/products';
-import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartProvider';
+import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
@@ -16,11 +15,11 @@ import { motion } from 'framer-motion';
 export default function ProductPage({ params }: { params: { id: string } }) {
   const [selectedSize, setSelectedSize] = useState<string | undefined>(undefined);
   const [quantity] = useState(1);
-  const { dispatch } = useCart();
+  const { state, dispatch } = useCart();
   const { toast } = useToast();
   const router = useRouter();
 
-  const product = products.find(p => p.id === params.id);
+  const product = state.products.find(p => p.id === params.id);
 
   if (!product) {
     notFound();
@@ -105,5 +104,3 @@ export default function ProductPage({ params }: { params: { id: string } }) {
     </motion.div>
   );
 }
-
-

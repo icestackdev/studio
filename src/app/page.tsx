@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { ProductCard } from '@/components/product-card';
 import { ProductListItem } from '@/components/product-list-item';
-import { products, categories } from '@/lib/products';
+import { useCart } from '@/contexts/CartProvider';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,8 @@ import { ArrowRight, LayoutGrid, List } from 'lucide-react';
 export default function HomePage() {
   const promoImage = PlaceHolderImages.find(img => img.id === 'promo-banner-1');
   const [layout, setLayout] = useState<'grid' | 'list'>('list');
+  const { state } = useCart();
+  const { products } = state;
 
   return (
     <motion.div

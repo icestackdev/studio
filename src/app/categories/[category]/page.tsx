@@ -3,7 +3,7 @@
 
 import { ProductCard } from '@/components/product-card';
 import { ProductListItem } from '@/components/product-list-item';
-import { products } from '@/lib/products';
+import { useCart } from '@/contexts/CartProvider';
 import { motion } from 'framer-motion';
 import { notFound, useParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
@@ -14,22 +14,24 @@ import { useRouter } from 'next/navigation';
 export default function CategoryProductsPage() {
   const router = useRouter();
   const params = useParams();
+  const { state } = useCart();
+  const { products } = state;
   const { category: categorySlug } = params;
   const [layout, setLayout] = useState<'grid' | 'list'>('list');
 
   const categoryName = useMemo(() => {
     if (typeof categorySlug !== 'string') return null;
-    const name = categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1);
-    // A real app would validate this against a list of actual categories
-    return name.replace('-', ' ');
-  }, [categorySlug]);
+    const name = decodeURIComponent(categorySlug.replace('-', ' '));
+    // Find the category in the state to get the correct capitalization
+    return state.categories.find(c => c.toLowerCase() === name.toLowerCase()) || null;
+  }, [categorySlug, state.categories]);
 
   const categoryProducts = useMemo(
     () =>
       products.filter(
         (p) => p.category.toLowerCase() === (categoryName || '').toLowerCase()
       ),
-    [categoryName]
+    [categoryName, products]
   );
 
   if (!categoryName || categoryProducts.length === 0) {
