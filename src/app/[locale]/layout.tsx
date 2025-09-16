@@ -9,7 +9,6 @@ import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
-import { notFound } from 'next/navigation';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
@@ -25,12 +24,7 @@ export default async function LocaleLayout({
   children: React.ReactNode;
   params: { locale: string };
 }>) {
-  let messages;
-  try {
-    messages = await getMessages();
-  } catch (error) {
-    notFound();
-  }
+  const messages = await getMessages();
   
   return (
     <html lang={locale}>
