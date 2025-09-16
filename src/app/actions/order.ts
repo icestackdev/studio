@@ -69,6 +69,7 @@ export async function getOrders() {
             id: item.id,
             quantity: item.quantity,
             size: item.size,
+            price: item.price,
             product: {
                 ...item.product,
                 category: item.product.category.name,
