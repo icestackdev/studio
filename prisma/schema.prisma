@@ -1,22 +1,18 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-datasource db {
-  provider     = "postgresql"
-  url          = env("DATABASE_URL")
-  engineType   = "library"
-}
-
 generator client {
-  provider        = "prisma-client-js"
-  // The following line is not needed for the library engine type
-  // binaryTargets = ["native", "debian-openssl-1.1.x"]
+  provider = "prisma-client-js"
 }
 
-model Category {
-  id       String    @id @default(cuid())
-  name     String    @unique
-  products Product[]
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Settings {
+  key   String @id
+  value String
 }
 
 model Product {
@@ -28,14 +24,25 @@ model Product {
   sizes       String[]
   category    Category       @relation(fields: [categoryId], references: [id])
   categoryId  String
-  orderItems  OrderItem[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  OrderItem   OrderItem[]
 }
 
 model ProductImage {
-  id        String  @id @default(cuid())
+  id        String   @id @default(cuid())
   url       String
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
   productId String
+  createdAt DateTime @default(now())
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Order {
@@ -46,29 +53,20 @@ model Order {
   customerNotes   String?
   items           OrderItem[]
   total           Float
-  status          OrderStatus @default(Pending)
+  deliveryFee     Float       @default(0)
+  status          String      // e.g., 'Pending', 'Confirmed', 'Shipped'
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 }
 
 model OrderItem {
-  id        String  @id @default(cuid())
-  order     Order   @relation(fields: [orderId], references: [id])
+  id        String   @id @default(cuid())
+  order     Order    @relation(fields: [orderId], references: [id])
   orderId   String
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
   productId String
   quantity  Int
+  price     Float // price at the time of order
   size      String
-  price     Float
-}
-
-model Settings {
-  key   String @id
-  value String
-}
-
-enum OrderStatus {
-  Pending
-  Confirmed
-  Shipped
+  createdAt DateTime @default(now())
 }
