@@ -19,18 +19,22 @@ export function useInfiniteScroll<T>({
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const observer = useRef<IntersectionObserver>();
+  const isInitialLoad = useRef(true);
 
-  const loadMore = useCallback(async () => {
+  const loadMore = useCallback(async (isInitial = false) => {
     if (isLoading || !hasMore) return;
+    if (!isInitial && isInitialLoad.current) return;
+
 
     setIsLoading(true);
     try {
       const newItems = await fetchFunction({ page, limit });
-      if (newItems.length > 0) {
-        setItems(prevItems => [...prevItems, ...newItems]);
-        setPage(prevPage => prevPage + 1);
-      }
+      setItems(prevItems => [...prevItems, ...newItems]);
+      setPage(prevPage => prevPage + 1);
       setHasMore(newItems.length === limit);
+      if(isInitial) {
+        isInitialLoad.current = false;
+      }
     } catch (error) {
       console.error("Failed to fetch more items", error);
     } finally {
@@ -43,7 +47,7 @@ export function useInfiniteScroll<T>({
     if (observer.current) observer.current.disconnect();
     
     observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasMore) {
+      if (entries[0].isIntersecting && hasMore && !isInitialLoad.current) {
         loadMore();
       }
     });
@@ -56,11 +60,13 @@ export function useInfiniteScroll<T>({
     setPage(1);
     setHasMore(true);
     setIsLoading(false);
-  }, []);
+    isInitialLoad.current = true;
+    loadMore(true);
+  }, [loadMore]);
 
   useEffect(() => {
-    loadMore();
-  }, []); // Initial load
+    loadMore(true);
+  }, []);
 
   return { items, lastItemRef, hasMore, isLoading, reset };
 }
