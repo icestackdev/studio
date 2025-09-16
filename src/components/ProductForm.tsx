@@ -16,6 +16,7 @@ import { Product } from '@/lib/types';
 import { X, ImagePlus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { useTranslations } from 'next-intl';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -38,6 +39,7 @@ interface ProductFormProps {
 const MAX_IMAGES = 2;
 
 export function ProductForm({ onSubmit, onCancel, initialData, categories }: ProductFormProps) {
+  const t = useTranslations('ProductForm');
   const { toast } = useToast();
   const [imagePreviews, setImagePreviews] = useState<string[]>(initialData?.images?.map(i => i.url) || []);
   const [existingImages, setExistingImages] = useState<string[]>(initialData?.images?.map(i => i.url) || []);
@@ -67,7 +69,7 @@ export function ProductForm({ onSubmit, onCancel, initialData, categories }: Pro
       if (totalImages > MAX_IMAGES) {
         toast({
           variant: 'destructive',
-          title: `You can only upload a maximum of ${MAX_IMAGES} images.`,
+          title: t('maxImagesError', { maxImages: MAX_IMAGES }),
         });
         if(fileInputRef.current) {
             fileInputRef.current.value = '';
@@ -125,7 +127,7 @@ export function ProductForm({ onSubmit, onCancel, initialData, categories }: Pro
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         <Card>
             <CardHeader>
-                <CardTitle className="text-base">Product Details</CardTitle>
+                <CardTitle className="text-base">{t('productDetails')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
                 <FormField
@@ -133,9 +135,9 @@ export function ProductForm({ onSubmit, onCancel, initialData, categories }: Pro
                 name="name"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>Product Name</FormLabel>
+                    <FormLabel>{t('productName')}</FormLabel>
                     <FormControl>
-                        <Input placeholder="e.g., Summer T-Shirt" {...field} />
+                        <Input placeholder={t('productNamePlaceholder')} {...field} />
                     </FormControl>
                     <FormMessage />
                     </FormItem>
@@ -146,9 +148,9 @@ export function ProductForm({ onSubmit, onCancel, initialData, categories }: Pro
                 name="description"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel>{t('description')}</FormLabel>
                     <FormControl>
-                        <Textarea placeholder="A brief description of the product." {...field} />
+                        <Textarea placeholder={t('descriptionPlaceholder')} {...field} />
                     </FormControl>
                     <FormMessage />
                     </FormItem>
@@ -160,9 +162,9 @@ export function ProductForm({ onSubmit, onCancel, initialData, categories }: Pro
                     name="price"
                     render={({ field }) => (
                         <FormItem>
-                        <FormLabel>Price</FormLabel>
+                        <FormLabel>{t('price')}</FormLabel>
                         <FormControl>
-                            <Input type="number" step="0.01" placeholder="e.g., 29.99" {...field} />
+                            <Input type="number" step="0.01" placeholder={t('pricePlaceholder')} {...field} />
                         </FormControl>
                         <FormMessage />
                         </FormItem>
@@ -173,11 +175,11 @@ export function ProductForm({ onSubmit, onCancel, initialData, categories }: Pro
                     name="categoryId"
                     render={({ field }) => (
                         <FormItem>
-                        <FormLabel>Category</FormLabel>
+                        <FormLabel>{t('category')}</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
                             <SelectTrigger>
-                                <SelectValue placeholder="Select" />
+                                <SelectValue placeholder={t('selectCategory')} />
                             </SelectTrigger>
                             </FormControl>
                             <SelectContent>
@@ -196,7 +198,7 @@ export function ProductForm({ onSubmit, onCancel, initialData, categories }: Pro
        
         <Card>
             <CardHeader>
-                <CardTitle className="text-base">Sizing & Images</CardTitle>
+                <CardTitle className="text-base">{t('sizingAndImages')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
                 <FormField
@@ -204,9 +206,9 @@ export function ProductForm({ onSubmit, onCancel, initialData, categories }: Pro
                 name="sizes"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>Sizes</FormLabel>
+                    <FormLabel>{t('sizes')}</FormLabel>
                     <FormControl>
-                        <Input placeholder="S, M, L, XL" {...field} />
+                        <Input placeholder={t('sizesPlaceholder')} {...field} />
                     </FormControl>
                     <FormMessage />
                     </FormItem>
@@ -214,7 +216,7 @@ export function ProductForm({ onSubmit, onCancel, initialData, categories }: Pro
                 />
                 
                 <FormItem>
-                <FormLabel>Product Images (up to {MAX_IMAGES})</FormLabel>
+                <FormLabel>{t('productImages', { maxImages: MAX_IMAGES })}</FormLabel>
                     <FormControl>
                         <Input 
                             type="file" 
@@ -250,7 +252,7 @@ export function ProductForm({ onSubmit, onCancel, initialData, categories }: Pro
                                 onClick={() => fileInputRef.current?.click()}
                             >
                                 <ImagePlus className="h-8 w-8 text-muted-foreground" />
-                                <span className="text-xs text-muted-foreground">Add Image</span>
+                                <span className="text-xs text-muted-foreground">{t('addImage')}</span>
                             </Button>
                         )}
                     </div>
@@ -260,8 +262,8 @@ export function ProductForm({ onSubmit, onCancel, initialData, categories }: Pro
 
         <Card>
             <CardFooter className="flex justify-end gap-2 pt-4">
-                <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
-                <Button type="submit">Save Product</Button>
+                <Button type="button" variant="outline" onClick={onCancel}>{t('cancel')}</Button>
+                <Button type="submit">{t('saveProduct')}</Button>
             </CardFooter>
         </Card>
       </form>

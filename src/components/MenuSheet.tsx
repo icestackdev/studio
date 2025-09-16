@@ -1,8 +1,9 @@
-
 "use client";
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useCart } from '@/contexts/CartProvider';
+import { LanguageSwitcher } from './LanguageSwitcher';
+import { Separator } from './ui/separator';
 
 interface MenuSheetProps {
   open: boolean;
@@ -19,8 +20,9 @@ export function MenuSheet({ open, onOpenChange }: MenuSheetProps) {
         </SheetHeader>
         <div className="flex flex-col h-full py-4">
             <div className="flex-1">
-                {/* Future menu items can go here */}
+                <LanguageSwitcher />
             </div>
+             <Separator className="my-4" />
             <div className="text-center text-xs text-muted-foreground">
                 <p>Version 1.0.0</p>
                 <p>Copyright © pixcelperfect.design</p>

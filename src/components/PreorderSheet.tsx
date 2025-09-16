@@ -17,6 +17,7 @@ import { useTelegram } from '@/hooks/useTelegram';
 import { createOrder } from '@/app/actions/order';
 import type { CustomerInfo } from '@/lib/types';
 import { Separator } from './ui/separator';
+import { useTranslations } from 'next-intl';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -33,6 +34,7 @@ interface PreorderSheetProps {
 }
 
 export function PreorderSheet({ open, onOpenChange }: PreorderSheetProps) {
+  const t = useTranslations('PreorderSheet');
   const { state, dispatch } = useCart();
   const { toast } = useToast();
   const webApp = useTelegram();
@@ -78,8 +80,8 @@ export function PreorderSheet({ open, onOpenChange }: PreorderSheetProps) {
         dispatch({ type: 'CLEAR_CART' });
 
         toast({
-            title: 'Pre-order Placed!',
-            description: 'Your order has been confirmed. Check your profile for details.',
+            title: t('preorderPlaced'),
+            description: t('preorderPlacedDesc'),
         });
         setIsSubmitting(false);
         onOpenChange(false);
@@ -88,8 +90,8 @@ export function PreorderSheet({ open, onOpenChange }: PreorderSheetProps) {
         console.error(error);
         toast({
             variant: 'destructive',
-            title: 'Failed to place pre-order.',
-            description: 'Please try again later.',
+            title: t('preorderError'),
+            description: t('preorderErrorDesc'),
         });
         setIsSubmitting(false);
     }
@@ -99,9 +101,9 @@ export function PreorderSheet({ open, onOpenChange }: PreorderSheetProps) {
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="rounded-t-lg max-w-lg mx-auto p-4">
         <SheetHeader>
-          <SheetTitle className="text-lg">Confirm Your Pre-order</SheetTitle>
+          <SheetTitle className="text-lg">{t('confirmYourPreorder')}</SheetTitle>
           <SheetDescription className="text-sm">
-            Please provide your details to finalize the pre-order.
+            {t('provideDetails')}
           </SheetDescription>
         </SheetHeader>
         <Form {...form}>
@@ -111,9 +113,9 @@ export function PreorderSheet({ open, onOpenChange }: PreorderSheetProps) {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm">Full Name</FormLabel>
+                  <FormLabel className="text-sm">{t('fullName')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="Your full name" {...field} />
+                    <Input placeholder={t('fullNamePlaceholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -124,9 +126,9 @@ export function PreorderSheet({ open, onOpenChange }: PreorderSheetProps) {
               name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm">Phone Number</FormLabel>
+                  <FormLabel className="text-sm">{t('phone')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="Your phone number" {...field} />
+                    <Input placeholder={t('phonePlaceholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -137,9 +139,9 @@ export function PreorderSheet({ open, onOpenChange }: PreorderSheetProps) {
               name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm">Shipping Address</FormLabel>
+                  <FormLabel className="text-sm">{t('address')}</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Your full shipping address" {...field} />
+                    <Textarea placeholder={t('addressPlaceholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -150,9 +152,9 @@ export function PreorderSheet({ open, onOpenChange }: PreorderSheetProps) {
               name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm">Notes (Optional)</FormLabel>
+                  <FormLabel className="text-sm">{t('notes')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="Any special instructions?" {...field} />
+                    <Input placeholder={t('notesPlaceholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -162,15 +164,15 @@ export function PreorderSheet({ open, onOpenChange }: PreorderSheetProps) {
             <div className="pt-2 space-y-2">
                 <Separator />
                 <div className="flex justify-between text-base">
-                    <span>Subtotal</span>
+                    <span>{t('subtotal')}</span>
                     <span>${subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-base">
-                    <span>Delivery Fee</span>
+                    <span>{t('deliveryFee')}</span>
                     <span>${deliveryFee.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between font-bold text-lg">
-                    <span>Total</span>
+                    <span>{t('total')}</span>
                     <span>${total.toFixed(2)}</span>
                 </div>
             </div>
@@ -178,7 +180,7 @@ export function PreorderSheet({ open, onOpenChange }: PreorderSheetProps) {
              <SheetFooter className="gap-2 sm:justify-end pt-2">
                 <Button type="submit" disabled={isSubmitting} size="lg" className='w-full'>
                     {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Confirm Pre-order for ${total.toFixed(2)}
+                    {t('confirmButton', { total: total.toFixed(2) })}
                 </Button>
             </SheetFooter>
           </form>

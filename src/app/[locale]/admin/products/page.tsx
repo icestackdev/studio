@@ -1,0 +1,188 @@
+
+"use client";
+
+import { useState, useEffect } from 'react';
+import { useRouter } from '@/navigation';
+import { ProductForm } from '@/components/ProductForm';
+import { Button } from '@/components/ui/button';
+import { ProductCard } from '@/components/product-card';
+import { ArrowLeft, Edit, Trash2, Loader2 } from 'lucide-react';
+import type { Product } from '@/lib/types';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { getProducts, addProduct, updateProduct, deleteProduct } from '@/app/actions/product';
+import type { Category } from '@prisma/client';
+import { getCategories } from '@/app/actions/category';
+import { useToast } from '@/hooks/use-toast';
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
+import { useTranslations } from 'next-intl';
+
+export default function ManageProductsPage() {
+  const t = useTranslations('AdminProductsPage');
+  const router = useRouter();
+  const { toast } = useToast();
+  const [isAdding, setIsAdding] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const {
+    items: productList,
+    hasMore,
+    isLoading,
+    lastItemRef,
+    reset,
+  } = useInfiniteScroll<Product>({
+    fetchFunction: getProducts,
+    limit: 6,
+  });
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    const fetchedCategories = await getCategories();
+    setCategories(fetchedCategories);
+  }
+
+  const handleDataChange = () => {
+    reset();
+  }
+
+  const handleAddProduct = async (data: FormData) => {
+    try {
+      await addProduct(data);
+      setIsAdding(false);
+      handleDataChange();
+      toast({ title: t('productAdded') });
+    } catch (error) {
+      console.error(error);
+      toast({ variant: 'destructive', title: t('addProductError') });
+    }
+  };
+  
+  const handleEditProduct = async (data: FormData) => {
+    if (!editingProduct) return;
+    try {
+      await updateProduct(editingProduct.id, data);
+      setEditingProduct(null);
+      handleDataChange();
+      toast({ title: t('productUpdated') });
+    } catch (error) {
+       console.error(error);
+      toast({ variant: 'destructive', title: t('updateProductError') });
+    }
+  }
+
+  const handleDeleteProduct = async (productId: string) => {
+    try {
+      await deleteProduct(productId);
+      handleDataChange();
+      toast({ title: t('productDeleted') });
+    } catch (error) {
+      toast({ variant: 'destructive', title: t('deleteProductError') });
+    }
+  };
+  
+  const handleStartEdit = (product: Product) => {
+    setEditingProduct(product);
+  }
+
+  const formInProgress = isAdding || editingProduct !== null;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+         <Button 
+            variant="ghost" 
+            className="rounded-full bg-background/60 hover:bg-background/80 backdrop-blur-sm h-auto"
+            onClick={() => {
+              if (formInProgress) {
+                setIsAdding(false);
+                setEditingProduct(null);
+              } else {
+                router.back();
+              }
+            }}
+        >
+            <ArrowLeft className="h-5 w-5" />
+            <span className="ml-1">{formInProgress ? t('cancel') : t('back')}</span>
+        </Button>
+        <h1 className="text-lg font-bold">{t('manageProducts')}</h1>
+      </div>
+
+      {isAdding ? (
+        <ProductForm 
+          onSubmit={handleAddProduct} 
+          onCancel={() => setIsAdding(false)} 
+          categories={categories}
+        />
+      ) : editingProduct ? (
+         <ProductForm 
+          onSubmit={handleEditProduct} 
+          onCancel={() => setEditingProduct(null)}
+          initialData={{
+            ...editingProduct,
+            sizes: Array.isArray(editingProduct.sizes) ? editingProduct.sizes.join(', ') : editingProduct.sizes,
+          }}
+          categories={categories}
+        />
+      ) : (
+        <>
+          <Button onClick={() => setIsAdding(true)}>{t('addNewProduct')}</Button>
+          <div className="grid grid-cols-2 gap-4">
+            {productList.map((product, index) => (
+              <div 
+                key={product.id} 
+                className="relative group"
+                ref={index === productList.length - 1 ? lastItemRef : null}
+              >
+                <ProductCard product={product} />
+                <div className="absolute top-2 right-2 flex items-center gap-1 bg-background/80 backdrop-blur-sm rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleStartEdit(product)}>
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive hover:text-destructive">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>{t('deleteConfirmTitle')}</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          {t('deleteConfirmDesc')}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleDeleteProduct(product.id)}>{t('delete')}</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </div>
+            ))}
+          </div>
+          {isLoading && (
+            <div className="flex justify-center items-center py-4">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+        )}
+        {!hasMore && productList.length > 0 && (
+            <p className="text-center text-sm text-muted-foreground py-4">{t('noMoreProducts')}</p>
+        )}
+        </>
+      )}
+    </div>
+  );
+}

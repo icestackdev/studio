@@ -1,12 +1,11 @@
 
 'use client';
 
-import Link from 'next/link';
+import { Link, usePathname } from '@/navigation';
 import { useCart } from '@/contexts/CartProvider';
 import { cn } from '@/lib/utils';
 import { Menu, ShoppingBag } from 'lucide-react';
 import { Button } from './ui/button';
-import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { MenuSheet } from './MenuSheet';
 

@@ -1,19 +1,20 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { Link, usePathname } from '@/navigation';
 import { Home, LayoutGrid, ShoppingCart, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCart } from '@/contexts/CartProvider';
+import { useTranslations } from 'next-intl';
 
 const navItems = [
-  { href: '/', label: 'Home', icon: Home },
-  { href: '/categories', label: 'Categories', icon: LayoutGrid },
-  { href: '/cart', label: 'Cart', icon: ShoppingCart },
-  { href: '/profile', label: 'Profile', icon: User },
+  { href: '/', labelKey: 'home', icon: Home },
+  { href: '/categories', labelKey: 'categories', icon: LayoutGrid },
+  { href: '/cart', labelKey: 'cart', icon: ShoppingCart },
+  { href: '/profile', labelKey: 'profile', icon: User },
 ];
 
 export function BottomNav() {
+  const t = useTranslations('BottomNav');
   const pathname = usePathname();
   const { state } = useCart();
   const cartItemCount = state.cartItems.reduce((acc, item) => acc + item.quantity, 0);
@@ -40,7 +41,7 @@ export function BottomNav() {
                   </span>
                 )}
               </div>
-              <span>{item.label}</span>
+              <span>{t(item.labelKey as any)}</span>
             </Link>
           );
         })}
