@@ -78,8 +78,7 @@ export default function ManageProductsPage() {
   };
   
   const handleStartEdit = (product: Product) => {
-    const sizesString = Array.isArray(product.sizes) ? product.sizes.join(', ') : '';
-    setEditingProduct({...product, sizes: sizesString as any});
+    setEditingProduct(product);
   }
 
   const formInProgress = isAdding || editingProduct !== null;

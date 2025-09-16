@@ -31,7 +31,7 @@ type ProductFormValues = z.infer<typeof formSchema>;
 interface ProductFormProps {
   onSubmit: (data: FormData) => void;
   onCancel: () => void;
-  initialData?: Partial<Product>
+  initialData?: Partial<Product> & { sizes: string | string[] };
   categories: Category[];
 }
 
@@ -47,11 +47,8 @@ export function ProductForm({ onSubmit, onCancel, initialData, categories }: Pro
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData ? {
-        name: initialData.name,
-        description: initialData.description,
-        price: initialData.price,
-        categoryId: initialData.categoryId,
-        sizes: Array.isArray(initialData.sizes) ? initialData.sizes.join(', ') : '',
+        ...initialData,
+        sizes: Array.isArray(initialData.sizes) ? initialData.sizes.join(', ') : initialData.sizes,
     } : {
       name: '',
       description: '',
@@ -233,7 +230,7 @@ export function ProductForm({ onSubmit, onCancel, initialData, categories }: Pro
                     <div className="grid grid-cols-3 gap-2">
                         {imagePreviews.map((preview, index) => (
                             <div key={preview} className="relative aspect-square">
-                                <Image src={preview} alt={`Image preview ${index + 1}`} layout="fill" objectFit="cover" className="rounded-md" />
+                                <Image src={preview} alt={`Image preview ${index + 1}`} fill objectFit="cover" className="rounded-md" />
                                 <Button
                                     type="button"
                                     variant="destructive"
@@ -250,7 +247,7 @@ export function ProductForm({ onSubmit, onCancel, initialData, categories }: Pro
                                 type="button"
                                 variant="outline" 
                                 className="aspect-square flex-col gap-1 h-full w-full"
-                                onClick={() => fileInputRect.current?.click()}
+                                onClick={() => fileInputRef.current?.click()}
                             >
                                 <ImagePlus className="h-8 w-8 text-muted-foreground" />
                                 <span className="text-xs text-muted-foreground">Add Image</span>
