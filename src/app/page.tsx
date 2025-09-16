@@ -17,6 +17,7 @@ export default function HomePage() {
   const [layout, setLayout] = useState<'grid' | 'list'>('list');
   const { state } = useCart();
   const { products } = state;
+  
 
   return (
     <motion.div
