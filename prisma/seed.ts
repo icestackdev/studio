@@ -135,7 +135,7 @@ async function main() {
         categoryId: p.category.id,
         sizes: p.sizes,
         images: {
-          deleteMany: {}, // optional: clear old images if you want fresh ones
+          deleteMany: {}, 
           create: p.imageIds
             .map(id => placeholderData.placeholderImages.find(img => img.id === id))
             .filter(img => !!img)
