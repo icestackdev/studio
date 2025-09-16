@@ -15,6 +15,7 @@ import type { Category } from '@prisma/client';
 import { Product } from '@/lib/types';
 import { X, ImagePlus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -71,7 +72,6 @@ export function ProductForm({ onSubmit, onCancel, initialData, categories }: Pro
           variant: 'destructive',
           title: `You can only upload a maximum of ${MAX_IMAGES} images.`,
         });
-        // Reset file input
         if(fileInputRef.current) {
             fileInputRef.current.value = '';
         }
@@ -87,14 +87,11 @@ export function ProductForm({ onSubmit, onCancel, initialData, categories }: Pro
   const handleRemoveImage = (index: number) => {
     const removedPreview = imagePreviews[index];
     
-    // Determine if it was an existing image or a new one
     if (index < existingImages.length) {
-      // It's an existing image that we are removing
       const newExisting = [...existingImages];
       newExisting.splice(index, 1);
       setExistingImages(newExisting);
     } else {
-      // It's a new image file
       const newFileIndex = index - existingImages.length;
       const newFiles = [...newImageFiles];
       newFiles.splice(newFileIndex, 1);
@@ -102,7 +99,6 @@ export function ProductForm({ onSubmit, onCancel, initialData, categories }: Pro
     }
     
     setImagePreviews(prev => prev.filter((_, i) => i !== index));
-    // Revoke object URL to free memory
     URL.revokeObjectURL(removedPreview);
   }
 
@@ -129,132 +125,149 @@ export function ProductForm({ onSubmit, onCancel, initialData, categories }: Pro
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Product Name</FormLabel>
-              <FormControl>
-                <Input placeholder="e.g., Summer T-Shirt" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea placeholder="A brief description of the product." {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="price"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Price</FormLabel>
-              <FormControl>
-                <Input type="number" step="0.01" placeholder="e.g., 29.99" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="categoryId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Category</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a category" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {categories.map(cat => (
-                    <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="sizes"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Sizes</FormLabel>
-              <FormControl>
-                <Input placeholder="S, M, L, XL" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormItem>
-          <FormLabel>Product Images (up to {MAX_IMAGES})</FormLabel>
-            <FormControl>
-                <Input 
-                    type="file" 
-                    multiple
-                    accept="image/*"
-                    ref={fileInputRef}
-                    onChange={handleImageChange}
-                    className="hidden"
-                    disabled={imageCount >= MAX_IMAGES}
-                />
-            </FormControl>
-            <FormMessage />
-            <div className="grid grid-cols-3 gap-2">
-                {imagePreviews.map((preview, index) => (
-                    <div key={preview} className="relative aspect-square">
-                        <Image src={preview} alt={`Image preview ${index + 1}`} layout="fill" objectFit="cover" className="rounded-md" />
-                        <Button
-                            type="button"
-                            variant="destructive"
-                            size="icon"
-                            className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
-                            onClick={() => handleRemoveImage(index)}
-                        >
-                            <X className="h-4 w-4" />
-                        </Button>
-                    </div>
-                ))}
-                 {imageCount < MAX_IMAGES && (
-                    <Button 
-                        type="button"
-                        variant="outline" 
-                        className="aspect-square flex-col gap-1 h-full w-full"
-                        onClick={() => fileInputRef.current?.click()}
-                    >
-                        <ImagePlus className="h-8 w-8 text-muted-foreground" />
-                        <span className="text-xs text-muted-foreground">Add Image</span>
-                    </Button>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+        <Card>
+            <CardHeader>
+                <CardTitle className="text-base">Product Details</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Product Name</FormLabel>
+                    <FormControl>
+                        <Input placeholder="e.g., Summer T-Shirt" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                    </FormItem>
                 )}
-            </div>
-        </FormItem>
+                />
+                <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                        <Textarea placeholder="A brief description of the product." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                    </FormItem>
+                )}
+                />
+                 <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                    control={form.control}
+                    name="price"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Price</FormLabel>
+                        <FormControl>
+                            <Input type="number" step="0.01" placeholder="e.g., 29.99" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                    <FormField
+                    control={form.control}
+                    name="categoryId"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Category</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select" />
+                            </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                            {categories.map(cat => (
+                                <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                            ))}
+                            </SelectContent>
+                        </Select>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                 </div>
+            </CardContent>
+        </Card>
+       
+        <Card>
+            <CardHeader>
+                <CardTitle className="text-base">Sizing & Images</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <FormField
+                control={form.control}
+                name="sizes"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Sizes</FormLabel>
+                    <FormControl>
+                        <Input placeholder="S, M, L, XL" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                    </FormItem>
+                )}
+                />
+                
+                <FormItem>
+                <FormLabel>Product Images (up to {MAX_IMAGES})</FormLabel>
+                    <FormControl>
+                        <Input 
+                            type="file" 
+                            multiple
+                            accept="image/*"
+                            ref={fileInputRef}
+                            onChange={handleImageChange}
+                            className="hidden"
+                            disabled={imageCount >= MAX_IMAGES}
+                        />
+                    </FormControl>
+                    <FormMessage />
+                    <div className="grid grid-cols-3 gap-2">
+                        {imagePreviews.map((preview, index) => (
+                            <div key={preview} className="relative aspect-square">
+                                <Image src={preview} alt={`Image preview ${index + 1}`} layout="fill" objectFit="cover" className="rounded-md" />
+                                <Button
+                                    type="button"
+                                    variant="destructive"
+                                    size="icon"
+                                    className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                                    onClick={() => handleRemoveImage(index)}
+                                >
+                                    <X className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        ))}
+                        {imageCount < MAX_IMAGES && (
+                            <Button 
+                                type="button"
+                                variant="outline" 
+                                className="aspect-square flex-col gap-1 h-full w-full"
+                                onClick={() => fileInputRect.current?.click()}
+                            >
+                                <ImagePlus className="h-8 w-8 text-muted-foreground" />
+                                <span className="text-xs text-muted-foreground">Add Image</span>
+                            </Button>
+                        )}
+                    </div>
+                </FormItem>
+            </CardContent>
+        </Card>
 
-
-        <div className="flex justify-end gap-2 pt-4">
-          <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
-          <Button type="submit">Save Product</Button>
-        </div>
+        <Card>
+            <CardFooter className="flex justify-end gap-2 pt-4">
+                <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
+                <Button type="submit">Save Product</Button>
+            </CardFooter>
+        </Card>
       </form>
     </Form>
   );
 }
-
