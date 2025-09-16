@@ -9,11 +9,12 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Image from 'next/image';
 import type { Category } from '@prisma/client';
 import { Product } from '@/lib/types';
-import { X } from 'lucide-react';
+import { X, ImagePlus } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -33,9 +34,14 @@ interface ProductFormProps {
   categories: Category[];
 }
 
+const MAX_IMAGES = 2;
+
 export function ProductForm({ onSubmit, onCancel, initialData, categories }: ProductFormProps) {
+  const { toast } = useToast();
   const [imagePreviews, setImagePreviews] = useState<string[]>(initialData?.images?.map(i => i.url) || []);
   const [existingImages, setExistingImages] = useState<string[]>(initialData?.images?.map(i => i.url) || []);
+  const [newImageFiles, setNewImageFiles] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(formSchema),
@@ -58,30 +64,58 @@ export function ProductForm({ onSubmit, onCancel, initialData, categories }: Pro
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
+      const totalImages = imagePreviews.length + files.length;
+
+      if (totalImages > MAX_IMAGES) {
+        toast({
+          variant: 'destructive',
+          title: `You can only upload a maximum of ${MAX_IMAGES} images.`,
+        });
+        // Reset file input
+        if(fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+        return;
+      }
+      
       const newPreviews = files.map(file => URL.createObjectURL(file));
       setImagePreviews(prev => [...prev, ...newPreviews]);
+      setNewImageFiles(prev => [...prev, ...files]);
     }
   };
   
-  const handleRemoveImage = (index: number, isExisting: boolean) => {
-    if (isExisting) {
-        setExistingImages(prev => prev.filter((_, i) => i !== index));
+  const handleRemoveImage = (index: number) => {
+    const removedPreview = imagePreviews[index];
+    
+    // Determine if it was an existing image or a new one
+    if (index < existingImages.length) {
+      // It's an existing image that we are removing
+      const newExisting = [...existingImages];
+      newExisting.splice(index, 1);
+      setExistingImages(newExisting);
+    } else {
+      // It's a new image file
+      const newFileIndex = index - existingImages.length;
+      const newFiles = [...newImageFiles];
+      newFiles.splice(newFileIndex, 1);
+      setNewImageFiles(newFiles);
     }
+    
     setImagePreviews(prev => prev.filter((_, i) => i !== index));
+    // Revoke object URL to free memory
+    URL.revokeObjectURL(removedPreview);
   }
 
   const handleSubmit = (data: ProductFormValues) => {
     const formData = new FormData();
     Object.entries(data).forEach(([key, value]) => {
-        if (key === 'images') {
-            if (data.images && data.images.length > 0) {
-                for (let i = 0; i < data.images.length; i++) {
-                    formData.append('images', data.images[i]);
-                }
-            }
-        } else if (value !== undefined && value !== null) {
+        if (key !== 'images' && value !== undefined && value !== null) {
             formData.append(key, value.toString());
         }
+    });
+
+    newImageFiles.forEach(file => {
+        formData.append('images', file);
     });
     
     if (initialData) {
@@ -90,6 +124,8 @@ export function ProductForm({ onSubmit, onCancel, initialData, categories }: Pro
 
     onSubmit(formData);
   };
+  
+  const imageCount = imagePreviews.length;
 
   return (
     <Form {...form}>
@@ -169,47 +205,49 @@ export function ProductForm({ onSubmit, onCancel, initialData, categories }: Pro
           )}
         />
         
-        <FormField
-          control={form.control}
-          name="images"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Product Images</FormLabel>
-               <FormControl>
+        <FormItem>
+          <FormLabel>Product Images (up to {MAX_IMAGES})</FormLabel>
+            <FormControl>
                 <Input 
                     type="file" 
-                    multiple 
-                    onChange={(e) => {
-                        field.onChange(e.target.files);
-                        handleImageChange(e);
-                    }}
+                    multiple
+                    accept="image/*"
+                    ref={fileInputRef}
+                    onChange={handleImageChange}
+                    className="hidden"
+                    disabled={imageCount >= MAX_IMAGES}
                 />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="flex gap-4 mt-4 flex-wrap">
-            {imagePreviews.map((preview, index) => (
-                preview && (
-                    <div key={index} className="relative mt-2">
-                        <div className="mt-2 w-24 h-24 relative">
-                            <Image src={preview} alt={`Image preview ${index + 1}`} layout="fill" objectFit="cover" className="rounded-md" />
-                        </div>
+            </FormControl>
+            <FormMessage />
+            <div className="grid grid-cols-3 gap-2">
+                {imagePreviews.map((preview, index) => (
+                    <div key={preview} className="relative aspect-square">
+                        <Image src={preview} alt={`Image preview ${index + 1}`} layout="fill" objectFit="cover" className="rounded-md" />
                         <Button
                             type="button"
                             variant="destructive"
                             size="icon"
                             className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
-                            onClick={() => handleRemoveImage(index, index < existingImages.length)}
+                            onClick={() => handleRemoveImage(index)}
                         >
                             <X className="h-4 w-4" />
                         </Button>
                     </div>
-                )
-            ))}
-        </div>
+                ))}
+                 {imageCount < MAX_IMAGES && (
+                    <Button 
+                        type="button"
+                        variant="outline" 
+                        className="aspect-square flex-col gap-1 h-full w-full"
+                        onClick={() => fileInputRef.current?.click()}
+                    >
+                        <ImagePlus className="h-8 w-8 text-muted-foreground" />
+                        <span className="text-xs text-muted-foreground">Add Image</span>
+                    </Button>
+                )}
+            </div>
+        </FormItem>
+
 
         <div className="flex justify-end gap-2 pt-4">
           <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
@@ -219,3 +257,4 @@ export function ProductForm({ onSubmit, onCancel, initialData, categories }: Pro
     </Form>
   );
 }
+
