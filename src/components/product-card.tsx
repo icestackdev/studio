@@ -5,11 +5,7 @@ import type { Product } from '@/lib/types';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Card, CardContent } from '@/components/ui/card';
 import { motion } from 'framer-motion';
-import { ImageIcon, ShoppingBag } from 'lucide-react';
-import { Button } from './ui/button';
-import { useCart } from '@/contexts/CartProvider';
-import { useToast } from '@/hooks/use-toast';
-import { useState } from 'react';
+import { ImageIcon } from 'lucide-react';
 
 interface ProductCardProps {
   product: Product;
@@ -19,27 +15,6 @@ export function ProductCard({ product }: ProductCardProps) {
   const primaryImage = product.images && product.images.length > 0
     ? PlaceHolderImages.find(img => img.id === product.images[0].id)
     : null;
-
-  const { dispatch } = useCart();
-  const { toast } = useToast();
-  const [selectedSize] = useState(product.sizes[0]);
-
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!selectedSize) {
-      toast({
-        variant: 'destructive',
-        title: 'Please select a size on the product page.',
-      });
-      return;
-    }
-    dispatch({ type: 'ADD_TO_CART', payload: { product, size: selectedSize, quantity: 1 } });
-    toast({
-      title: 'Added to cart!',
-      description: `${product.name} (${selectedSize}) has been added to your cart.`,
-    });
-  };
 
   return (
     <motion.div
@@ -69,9 +44,6 @@ export function ProductCard({ product }: ProductCardProps) {
             <p className="text-xs text-muted-foreground">{product.category}</p>
             <div className="flex justify-between items-center mt-2">
               <p className="text-base font-bold text-primary">${product.price.toFixed(2)}</p>
-              <Button size="icon" variant="ghost" onClick={handleAddToCart} className="h-8 w-8 rounded-full">
-                <ShoppingBag className="h-4 w-4" />
-              </Button>
             </div>
           </CardContent>
         </Card>
