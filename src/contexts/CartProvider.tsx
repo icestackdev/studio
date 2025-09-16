@@ -7,6 +7,7 @@ import { getCategories } from '@/app/actions/category';
 import { getProducts } from '@/app/actions/product';
 import { getOrders } from '@/app/actions/order';
 import { getSetting, updateSetting } from '@/app/actions/setting';
+import { AppSkeleton } from '@/components/AppSkeleton';
 
 interface CartState {
   cartItems: CartItem[];
@@ -155,11 +156,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   if (loading) {
-    return (
-        <div className="flex justify-center items-center h-screen">
-            <div>Loading...</div>
-        </div>
-    );
+    return <AppSkeleton />;
   }
 
   return (
