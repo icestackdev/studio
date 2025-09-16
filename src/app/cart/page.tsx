@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -28,9 +29,7 @@ export default function CartPage() {
         transition={{ duration: 0.5 }}
         className="space-y-6"
       >
-        <div className="text-center py-4">
-          <h1 className="text-2xl font-bold tracking-tight">Your Cart</h1>
-        </div>
+        
 
         {state.cartItems.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground">
