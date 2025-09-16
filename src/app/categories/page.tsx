@@ -11,7 +11,7 @@ import { LayoutGrid, List } from 'lucide-react';
 import { useCart } from '@/contexts/CartProvider';
 
 export default function CategoriesPage() {
-  const [layout, setLayout] = useState<'grid' | 'list'>('list');
+  const [layout, setLayout] = useState<'grid' | 'list'>('grid');
   const { state } = useCart();
   const { products } = state;
 
@@ -33,14 +33,17 @@ export default function CategoriesPage() {
       transition={{ duration: 0.5 }}
       className="space-y-8"
     >
-      <div className="flex justify-end gap-2">
-            <Button variant={layout === 'grid' ? 'secondary' : 'ghost'} size="icon" onClick={() => setLayout('grid')}>
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold tracking-tight">Categories</h1>
+        <div className="flex justify-end gap-1">
+            <Button variant={layout === 'grid' ? 'secondary' : 'ghost'} size="icon" className="w-9 h-9" onClick={() => setLayout('grid')}>
                 <LayoutGrid className="h-5 w-5" />
             </Button>
-            <Button variant={layout === 'list' ? 'secondary' : 'ghost'} size="icon" onClick={() => setLayout('list')}>
+            <Button variant={layout === 'list' ? 'secondary' : 'ghost'} size="icon" className="w-9 h-9" onClick={() => setLayout('list')}>
                 <List className="h-5 w-5" />
             </Button>
         </div>
+      </div>
 
       {categories.map(([category, categoryProducts], index) => {
         if (categoryProducts.length === 0) return null;
@@ -52,24 +55,22 @@ export default function CategoriesPage() {
             transition={{ delay: index * 0.1 }}
             className="space-y-4"
           >
-            <div className="sticky top-16 bg-background/95 backdrop-blur-sm z-10 py-2 -mx-4 px-4">
-                <div className="flex justify-between items-center max-w-lg mx-auto">
-                    <h2 className="text-xl font-bold tracking-tight">{category}</h2>
-                    <Link href={`/categories/${encodeURIComponent(category.toLowerCase().replace(/ /g, '-'))}`} passHref>
-                        <Button variant="link" className="text-primary pr-0">View All</Button>
-                    </Link>
-                </div>
+            <div className="flex justify-between items-center">
+                <h2 className="text-xl font-bold tracking-tight">{category}</h2>
+                <Link href={`/categories/${encodeURIComponent(category.toLowerCase().replace(/ /g, '-'))}`} passHref>
+                    <Button variant="link" className="text-primary pr-0">View All</Button>
+                </Link>
             </div>
 
             {layout === 'grid' ? (
-                <div className="grid grid-cols-2 gap-4">
-                {categoryProducts.slice(0, 4).map(product => (
+                <div className="grid grid-cols-2 gap-x-4 gap-y-6">
+                {categoryProducts.slice(0, 2).map(product => (
                     <ProductCard key={product.id} product={product} />
                 ))}
                 </div>
             ) : (
                 <div className="space-y-4">
-                {categoryProducts.slice(0, 4).map(product => (
+                {categoryProducts.slice(0, 2).map(product => (
                     <ProductListItem key={product.id} product={product} />
                 ))}
                 </div>

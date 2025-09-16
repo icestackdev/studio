@@ -31,6 +31,7 @@ export default function CartPage() {
         transition={{ duration: 0.5 }}
         className="space-y-6"
       >
+        <h1 className="text-3xl font-bold tracking-tight">Your Cart</h1>
         
 
         {state.cartItems.length === 0 ? (
@@ -81,20 +82,24 @@ export default function CartPage() {
                 );
               })}
             </AnimatePresence>
-            <div className="pt-4 space-y-2">
-                <div className="flex justify-between text-base">
-                    <span>Subtotal</span>
-                    <span>${subtotal.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-base">
-                    <span>Delivery Fee</span>
-                    <span>${deliveryFee.toFixed(2)}</span>
-                </div>
-                <Separator />
-                <div className="flex justify-between font-bold text-lg">
-                    <span>Total</span>
-                    <span>${total.toFixed(2)}</span>
-                </div>
+            <div className="pt-4 space-y-4">
+                <Card>
+                  <CardContent className="p-4 space-y-2">
+                    <div className="flex justify-between text-base">
+                        <span>Subtotal</span>
+                        <span className="font-medium">${subtotal.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-base">
+                        <span>Delivery Fee</span>
+                        <span className="font-medium">${deliveryFee.toFixed(2)}</span>
+                    </div>
+                    <Separator />
+                    <div className="flex justify-between font-bold text-lg">
+                        <span>Total</span>
+                        <span>${total.toFixed(2)}</span>
+                    </div>
+                  </CardContent>
+                </Card>
                 <div className="pt-2">
                     <Button className="w-full" size="lg" onClick={() => setIsSheetOpen(true)}>
                         Place Pre-order

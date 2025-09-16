@@ -48,25 +48,24 @@ export default function ProductPage({ params }: { params: { id: string } }) {
       className="pb-24"
     >
       <div className="relative">
-        <ProductImages product={product} />
         <Button 
             variant="ghost" 
-            className="absolute top-4 left-4 rounded-full bg-background/60 hover:bg-background/80 backdrop-blur-sm h-auto"
+            size="icon"
+            className="absolute top-4 left-4 rounded-full bg-background/60 hover:bg-background/80 backdrop-blur-sm z-10"
             onClick={() => router.back()}
         >
             <ArrowLeft className="h-5 w-5" />
-            <span className="ml-1">Back</span>
         </Button>
+        <ProductImages product={product} />
       </div>
 
 
       <div className="p-4 space-y-6">
         <div>
-            <h1 className="text-3xl font-bold tracking-tight">{product.name}</h1>
-            <p className="text-muted-foreground text-sm mt-1">{product.category}</p>
+            <p className="text-muted-foreground text-sm font-medium">{product.category}</p>
+            <h1 className="text-2xl font-bold tracking-tight">{product.name}</h1>
         </div>
 
-        <p className="text-3xl font-bold text-primary">${product.price.toFixed(2)}</p>
         
         <p className="text-foreground/80 text-base leading-relaxed">{product.description}</p>
         
@@ -97,9 +96,15 @@ export default function ProductPage({ params }: { params: { id: string } }) {
       </div>
       
       <div className="fixed bottom-16 left-0 right-0 p-4 bg-background/95 backdrop-blur-sm border-t max-w-lg mx-auto z-30">
-        <Button size="lg" className="w-full text-base font-bold py-6 rounded-xl" onClick={handleAddToCart}>
-          <ShoppingCart className="mr-2 h-5 w-5" /> Add to Cart
-        </Button>
+        <div className="flex items-center justify-between">
+            <div>
+                <p className="text-sm text-muted-foreground">Total Price</p>
+                <p className="text-2xl font-bold text-primary">${product.price.toFixed(2)}</p>
+            </div>
+            <Button size="lg" className="text-base font-bold py-6 rounded-xl w-1/2" onClick={handleAddToCart}>
+              <ShoppingCart className="mr-2 h-5 w-5" /> Add to Cart
+            </Button>
+        </div>
       </div>
     </motion.div>
   );

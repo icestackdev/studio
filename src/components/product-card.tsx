@@ -15,12 +15,12 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <motion.div
-      whileHover={{ y: -5, boxShadow: '0 8px 25px rgba(0,0,0,0.1)' }}
+      whileHover={{ y: -5 }}
       transition={{ duration: 0.2 }}
       className="group relative"
     >
-      <Link href={`/products/${product.id}`}>
-        <Card className="w-full overflow-hidden transition-all duration-300">
+      <Link href={`/products/${product.id}`} className="space-y-2 block">
+        <Card className="w-full overflow-hidden transition-all duration-300 border-0 shadow-none bg-muted rounded-lg">
           <div className="relative w-full aspect-[3/4] bg-muted overflow-hidden">
             {primaryImage ? (
               <Image
@@ -36,14 +36,11 @@ export function ProductCard({ product }: ProductCardProps) {
               </div>
             )}
           </div>
-          <CardContent className="p-3 bg-card">
-            <h3 className="text-sm font-semibold truncate text-foreground">{product.name}</h3>
-            <p className="text-xs text-muted-foreground">{product.category}</p>
-            <div className="flex justify-between items-center mt-2">
-              <p className="text-base font-bold text-primary">${product.price.toFixed(2)}</p>
-            </div>
-          </CardContent>
         </Card>
+        <div>
+            <h3 className="text-sm font-semibold truncate text-foreground">{product.name}</h3>
+            <p className="text-sm font-bold text-primary">${product.price.toFixed(2)}</p>
+        </div>
       </Link>
     </motion.div>
   );

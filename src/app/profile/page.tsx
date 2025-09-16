@@ -98,15 +98,15 @@ export default function ProfilePage() {
       transition={{ duration: 0.5 }}
       className="space-y-6"
     >
-      <div className="flex flex-col items-center space-y-2 py-4">
+      <div className="flex items-center space-x-4 pt-4">
         <Avatar className="h-20 w-20">
           <AvatarImage src={`https://t.me/i/userpic/320/${user?.username}.jpg`} />
           <AvatarFallback>
             <User className="h-10 w-10" />
           </AvatarFallback>
         </Avatar>
-        <div className="text-center">
-          <h1 className="text-lg font-bold">{user ? `${user.first_name} ${user.last_name || ''}` : 'Guest'}</h1>
+        <div className="text-left">
+          <h1 className="text-xl font-bold">{user ? `${user.first_name} ${user.last_name || ''}` : 'Guest'}</h1>
           <p className="text-muted-foreground text-sm">@{user?.username || 'your_username'}</p>
         </div>
       </div>

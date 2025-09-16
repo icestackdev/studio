@@ -17,7 +17,7 @@ export default function CategoryProductsPage() {
   const { state } = useCart();
   const { products } = state;
   const { category: categorySlug } = params;
-  const [layout, setLayout] = useState<'grid' | 'list'>('list');
+  const [layout, setLayout] = useState<'grid' | 'list'>('grid');
 
   const categoryName = useMemo(() => {
     if (typeof categorySlug !== 'string') return null;
@@ -46,7 +46,7 @@ export default function CategoryProductsPage() {
       className="space-y-6"
     >
       <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
             <Button
             variant="ghost"
             size="icon"
@@ -58,18 +58,18 @@ export default function CategoryProductsPage() {
             </Button>
             <h1 className="text-2xl font-bold tracking-tight">{categoryName}</h1>
         </div>
-        <div className="flex justify-end gap-2">
-            <Button variant={layout === 'grid' ? 'secondary' : 'ghost'} size="icon" onClick={() => setLayout('grid')}>
+        <div className="flex justify-end gap-1">
+            <Button variant={layout === 'grid' ? 'secondary' : 'ghost'} size="icon" className="w-9 h-9" onClick={() => setLayout('grid')}>
                 <LayoutGrid className="h-5 w-5" />
             </Button>
-            <Button variant={layout === 'list' ? 'secondary' : 'ghost'} size="icon" onClick={() => setLayout('list')}>
+            <Button variant={layout === 'list' ? 'secondary' : 'ghost'} size="icon" className="w-9 h-9" onClick={() => setLayout('list')}>
                 <List className="h-5 w-5" />
             </Button>
         </div>
       </div>
       
       {layout === 'grid' ? (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-6">
             {categoryProducts.map((product, index) => (
             <motion.div
                 key={product.id}

@@ -16,7 +16,7 @@ import type { Product } from '@/lib/types';
 
 export default function HomePage() {
   const promoImage = PlaceHolderImages.find(img => img.id === 'promo-banner-1');
-  const [layout, setLayout] = useState<'list' | 'list'>('list');
+  const [layout, setLayout] = useState<'grid' | 'list'>('grid');
   const {
     items: products,
     hasMore,
@@ -34,7 +34,7 @@ export default function HomePage() {
       transition={{ duration: 0.5 }}
       className="space-y-8"
     >
-      <div className="relative rounded-lg overflow-hidden h-64">
+      <div className="relative rounded-lg overflow-hidden h-80">
         {promoImage && (
             <Image
                 src={promoImage.imageUrl}
@@ -45,13 +45,13 @@ export default function HomePage() {
                 priority
             />
         )}
-        <div className="absolute inset-0 bg-black/40" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         <div className="absolute inset-0 flex flex-col items-start justify-end p-6 space-y-2">
             <motion.h1 
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
-              className="text-2xl font-bold tracking-tight text-white"
+              className="text-3xl font-bold tracking-tight text-white"
             >
               Summer Collection
             </motion.h1>
@@ -80,23 +80,18 @@ export default function HomePage() {
       <div>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold tracking-tight">New Arrivals</h2>
-          <div className="flex items-center gap-2">
-            <Link href="/categories" className="text-sm font-medium text-primary hover:underline">
-              View All
-            </Link>
-            <div className="flex justify-end gap-1">
-                <Button variant={layout === 'grid' ? 'secondary' : 'ghost'} size="icon" className="h-8 w-8" onClick={() => setLayout('grid')}>
-                    <LayoutGrid className="h-5 w-5" />
-                </Button>
-                <Button variant={layout === 'list' ? 'secondary' : 'ghost'} size="icon" className="h-8 w-8" onClick={() => setLayout('list')}>
-                    <List className="h-5 w-5" />
-                </Button>
-            </div>
+          <div className="flex items-center gap-1">
+            <Button variant={layout === 'grid' ? 'secondary' : 'ghost'} size="icon" className="h-9 w-9" onClick={() => setLayout('grid')}>
+                <LayoutGrid className="h-5 w-5" />
+            </Button>
+            <Button variant={layout === 'list' ? 'secondary' : 'ghost'} size="icon" className="h-9 w-9" onClick={() => setLayout('list')}>
+                <List className="h-5 w-5" />
+            </Button>
           </div>
         </div>
 
         {layout === 'grid' ? (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-6">
             {products.map((product, index) => (
               <motion.div
                 key={product.id}

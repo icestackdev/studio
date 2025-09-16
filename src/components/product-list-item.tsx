@@ -17,8 +17,9 @@ export function ProductListItem({ product }: ProductListItemProps) {
 
   return (
     <motion.div
-      whileHover={{ y: -2, boxShadow: '0 8px 25px rgba(0,0,0,0.08)' }}
+      whileHover={{ transform: 'translateX(2px)', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' }}
       transition={{ duration: 0.2 }}
+      className="rounded-lg"
     >
       <Link href={`/products/${product.id}`}>
         <Card className="w-full overflow-hidden transition-all duration-300">
