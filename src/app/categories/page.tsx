@@ -11,7 +11,7 @@ import { useState } from 'react';
 import { LayoutGrid, List } from 'lucide-react';
 
 export default function CategoriesPage() {
-  const [layout, setLayout] = useState<'grid' | 'list'>('grid');
+  const [layout, setLayout] = useState<'grid' | 'list'>('list');
 
   return (
     <motion.div

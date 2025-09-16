@@ -1,3 +1,4 @@
+
 'use client';
 
 import { ProductCard } from '@/components/product-card';
@@ -14,7 +15,7 @@ export default function CategoryProductsPage() {
   const router = useRouter();
   const params = useParams();
   const { category: categorySlug } = params;
-  const [layout, setLayout] = useState<'grid' | 'list'>('grid');
+  const [layout, setLayout] = useState<'grid' | 'list'>('list');
 
   const categoryName = useMemo(() => {
     if (typeof categorySlug !== 'string') return null;

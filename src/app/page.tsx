@@ -14,7 +14,7 @@ import { ArrowRight, LayoutGrid, List } from 'lucide-react';
 
 export default function HomePage() {
   const promoImage = PlaceHolderImages.find(img => img.id === 'promo-banner-1');
-  const [layout, setLayout] = useState<'grid' | 'list'>('grid');
+  const [layout, setLayout] = useState<'grid' | 'list'>('list');
 
   return (
     <motion.div
