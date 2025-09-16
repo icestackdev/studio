@@ -3,11 +3,16 @@
 
 import { products, categories } from '@/lib/products';
 import { ProductCard } from '@/components/product-card';
+import { ProductListItem } from '@/components/product-list-item';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import { LayoutGrid, List } from 'lucide-react';
 
 export default function CategoriesPage() {
+  const [layout, setLayout] = useState<'grid' | 'list'>('grid');
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -15,6 +20,15 @@ export default function CategoriesPage() {
       transition={{ duration: 0.5 }}
       className="space-y-8"
     >
+      <div className="flex justify-end gap-2">
+            <Button variant={layout === 'grid' ? 'secondary' : 'ghost'} size="icon" onClick={() => setLayout('grid')}>
+                <LayoutGrid className="h-5 w-5" />
+            </Button>
+            <Button variant={layout === 'list' ? 'secondary' : 'ghost'} size="icon" onClick={() => setLayout('list')}>
+                <List className="h-5 w-5" />
+            </Button>
+        </div>
+
       {categories.map((category, index) => {
         const categoryProducts = products.filter(p => p.category === category);
         return (
@@ -33,11 +47,20 @@ export default function CategoriesPage() {
                     </Link>
                 </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              {categoryProducts.slice(0, 4).map(product => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
+
+            {layout === 'grid' ? (
+                <div className="grid grid-cols-2 gap-4">
+                {categoryProducts.slice(0, 4).map(product => (
+                    <ProductCard key={product.id} product={product} />
+                ))}
+                </div>
+            ) : (
+                <div className="space-y-4">
+                {categoryProducts.slice(0, 4).map(product => (
+                    <ProductListItem key={product.id} product={product} />
+                ))}
+                </div>
+            )}
           </motion.div>
         );
       })}
