@@ -6,6 +6,7 @@ import type { CartItem, PreOrder, Product } from '@/lib/types';
 import { getCategories } from '@/app/actions/category';
 import { getProducts } from '@/app/actions/product';
 import { getOrders } from '@/app/actions/order';
+import { getSetting, updateSetting } from '@/app/actions/setting';
 
 interface CartState {
   cartItems: CartItem[];
@@ -21,8 +22,8 @@ type CartAction =
   | { type: 'UPDATE_QUANTITY'; payload: { cartItemId: string; quantity: number } }
   | { type: 'CONFIRM_PRE_ORDER'; payload: { customer: PreOrder['customer'], total: number } }
   | { type: 'CLEAR_CART' }
-  | { type: 'UPDATE_SHOP_NAME'; payload: string }
-  | { type: 'SET_INITIAL_DATA'; payload: { products: Product[], categories: string[], orders: PreOrder[] } };
+  | { type: 'SET_SHOP_NAME'; payload: string }
+  | { type: 'SET_INITIAL_DATA'; payload: { products: Product[], categories: string[], orders: PreOrder[], shopName: string } };
 
 
 const initialState: CartState = {
@@ -36,6 +37,7 @@ const initialState: CartState = {
 const CartContext = createContext<{
   state: CartState;
   dispatch: React.Dispatch<CartAction>;
+  updateShopName: (newName: string) => Promise<void>;
 } | undefined>(undefined);
 
 const cartReducer = (state: CartState, action: CartAction): CartState => {
@@ -46,6 +48,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
             products: action.payload.products,
             categories: action.payload.categories,
             preOrders: action.payload.orders,
+            shopName: action.payload.shopName,
         };
     case 'ADD_TO_CART': {
       const { product, size, quantity } = action.payload;
@@ -107,7 +110,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
         preOrders: [...state.preOrders, newPreOrder],
       };
     }
-    case 'UPDATE_SHOP_NAME': {
+    case 'SET_SHOP_NAME': {
         return {
             ...state,
             shopName: action.payload,
@@ -125,15 +128,17 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     async function fetchData() {
         try {
-            const [products, categories, orders] = await Promise.all([
+            const [products, categories, orders, shopName] = await Promise.all([
                 getProducts(),
                 getCategories(),
-                getOrders()
+                getOrders(),
+                getSetting('shopName'),
             ]);
             dispatch({ type: 'SET_INITIAL_DATA', payload: { 
                 products, 
                 categories: categories.map(c => c.name),
                 orders: orders as PreOrder[],
+                shopName: shopName?.value || 'ThreadLine',
             } });
         } catch (error) {
             console.error("Failed to fetch initial data", error);
@@ -144,6 +149,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     fetchData();
   }, []);
 
+  const updateShopName = async (newName: string) => {
+    await updateSetting('shopName', newName);
+    dispatch({ type: 'SET_SHOP_NAME', payload: newName });
+  };
+
   if (loading) {
     return (
         <div className="flex justify-center items-center h-screen">
@@ -153,7 +163,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   }
 
   return (
-    <CartContext.Provider value={{ state, dispatch }}>
+    <CartContext.Provider value={{ state, dispatch, updateShopName }}>
       {children}
     </CartContext.Provider>
   );

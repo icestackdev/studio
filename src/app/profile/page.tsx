@@ -23,7 +23,7 @@ type OrderWithItems = Order & { items: (OrderItem & { product: PrismaProduct })[
 
 export default function ProfilePage() {
   const webApp = useTelegram();
-  const { state, dispatch } = useCart();
+  const { state, updateShopName } = useCart();
   const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -52,12 +52,19 @@ export default function ProfilePage() {
     fetchMyOrders();
   }, []);
 
-  const handleSaveShopName = () => {
-    dispatch({ type: 'UPDATE_SHOP_NAME', payload: shopName });
-    toast({
-        title: 'Shop Name Updated',
-        description: `The shop name has been changed to "${shopName}".`
-    })
+  const handleSaveShopName = async () => {
+    try {
+      await updateShopName(shopName);
+      toast({
+          title: 'Shop Name Updated',
+          description: `The shop name has been changed to "${shopName}".`
+      });
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Error updating shop name.'
+      })
+    }
   };
 
   const reversedOrders = [...myOrders].reverse();

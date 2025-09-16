@@ -7,6 +7,16 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Start seeding ...');
 
+  await prisma.settings.upsert({
+    where: { key: 'shopName' },
+    update: {},
+    create: {
+      key: 'shopName',
+      value: 'ThreadLine',
+    },
+  });
+  console.log('Created default shop name setting');
+
   const categoriesData = [
     { name: 'Jackets' },
     { name: 'Sweaters' },
