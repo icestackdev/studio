@@ -156,7 +156,7 @@ export default function ProfilePage() {
 
                 <Separator />
                 
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 gap-2">
                     <Link href="/admin/products" passHref>
                         <Button variant="outline" className="w-full justify-start text-sm">
                             <Package className="mr-2 h-4 w-4" />
