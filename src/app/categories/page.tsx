@@ -15,13 +15,6 @@ export default function CategoriesPage() {
       transition={{ duration: 0.5 }}
       className="space-y-8"
     >
-      <div className="text-center py-4">
-        <h1 className="text-2xl font-bold tracking-tight">All Products</h1>
-        <p className="text-muted-foreground text-base">
-          Find what you're looking for
-        </p>
-      </div>
-
       {categories.map((category, index) => {
         const categoryProducts = products.filter(p => p.category === category);
         return (
