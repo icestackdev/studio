@@ -84,52 +84,64 @@ async function main() {
       imageIds: ['product-4-1', 'product-4-2'],
     },
     {
-        name: 'Crewneck Sweatshirt',
-        description: 'A comfortable and stylish heather grey crewneck sweatshirt.',
-        price: 69.99,
-        category: getCategory('Sweaters'),
-        sizes: ['S', 'M', 'L', 'XL'],
-        imageIds: ['product-5-1', 'product-5-2']
+      name: 'Crewneck Sweatshirt',
+      description: 'A comfortable and stylish heather grey crewneck sweatshirt.',
+      price: 69.99,
+      category: getCategory('Sweaters'),
+      sizes: ['S', 'M', 'L', 'XL'],
+      imageIds: ['product-5-1', 'product-5-2']
     },
     {
-        name: 'Button-Down Shirt',
-        description: 'A crisp white button-down shirt, a wardrobe essential.',
-        price: 59.99,
-        category: getCategory('Shirts'),
-        sizes: ['S', 'M', 'L', 'XL'],
-        imageIds: ['product-6-1', 'product-6-2']
+      name: 'Button-Down Shirt',
+      description: 'A crisp white button-down shirt, a wardrobe essential.',
+      price: 59.99,
+      category: getCategory('Shirts'),
+      sizes: ['S', 'M', 'L', 'XL'],
+      imageIds: ['product-6-1', 'product-6-2']
     },
     {
-        name: 'Floral Sundress',
-        description: 'A beautiful floral sundress, perfect for sunny days.',
-        price: 99.99,
-        category: getCategory('Dresses'),
-        sizes: ['S', 'M', 'L'],
-        imageIds: ['product-7-1', 'product-7-2']
+      name: 'Floral Sundress',
+      description: 'A beautiful floral sundress, perfect for sunny days.',
+      price: 99.99,
+      category: getCategory('Dresses'),
+      sizes: ['S', 'M', 'L'],
+      imageIds: ['product-7-1', 'product-7-2']
     },
     {
-        name: 'High-Waisted Jeans',
-        description: 'Classic high-waisted blue jeans for a flattering fit.',
-        price: 89.99,
-        category: getCategory('Jeans'),
-        sizes: ['26', '28', '30', '32'],
-        imageIds: ['product-8-1', 'product-8-2']
+      name: 'High-Waisted Jeans',
+      description: 'Classic high-waisted blue jeans for a flattering fit.',
+      price: 89.99,
+      category: getCategory('Jeans'),
+      sizes: ['26', '28', '30', '32'],
+      imageIds: ['product-8-1', 'product-8-2']
     },
     {
-        name: 'Leather Boots',
-        description: 'Stylish and durable brown leather boots.',
-        price: 129.99,
-        category: getCategory('Boots'),
-        sizes: ['7', '8', '9', '10', '11'],
-        imageIds: ['product-9-1', 'product-9-2']
+      name: 'Leather Boots',
+      description: 'Stylish and durable brown leather boots.',
+      price: 129.99,
+      category: getCategory('Boots'),
+      sizes: ['7', '8', '9', '10', '11'],
+      imageIds: ['product-9-1', 'product-9-2']
     }
   ];
 
   for (const p of productsData) {
     if (!p.category) continue;
     const product = await prisma.product.upsert({
-      where: { name: p.name },
-      update: {},
+      where: { name: p.name }, // unique field
+      update: {
+        description: p.description,
+        price: p.price,
+        categoryId: p.category.id,
+        sizes: p.sizes,
+        images: {
+          deleteMany: {}, // optional: clear old images if you want fresh ones
+          create: p.imageIds
+            .map(id => placeholderData.placeholderImages.find(img => img.id === id))
+            .filter(img => !!img)
+            .map(img => ({ url: img!.imageUrl })),
+        },
+      },
       create: {
         name: p.name,
         description: p.description,
@@ -144,8 +156,9 @@ async function main() {
         },
       },
     });
-    console.log(`Created product with id: ${product.id}`);
+    console.log(`Created/Updated product with id: ${product.id}`);
   }
+
 
   console.log('Seeding finished.');
 }
