@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { User, ShoppingBag, Settings, ListOrdered, Package, Save } from 'lucide-react';
+import { User, ShoppingBag, Settings, ListOrdered, Package, Save, Folder } from 'lucide-react';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -91,19 +91,27 @@ export default function ProfilePage() {
                 </div>
 
                 <Separator />
-
-                 <Link href="/admin/products" passHref>
-                    <Button variant="outline" className="w-full justify-start text-sm">
-                        <Package className="mr-2 h-4 w-4" />
-                        Manage Products
-                    </Button>
-                </Link>
-                 <Link href="/admin/orders" passHref>
-                    <Button variant="outline" className="w-full justify-start text-sm">
-                        <ListOrdered className="mr-2 h-4 w-4" />
-                        Manage Orders
-                    </Button>
-                </Link>
+                
+                <div className="grid grid-cols-2 gap-2">
+                    <Link href="/admin/products" passHref>
+                        <Button variant="outline" className="w-full justify-start text-sm">
+                            <Package className="mr-2 h-4 w-4" />
+                            Manage Products
+                        </Button>
+                    </Link>
+                    <Link href="/admin/categories" passHref>
+                        <Button variant="outline" className="w-full justify-start text-sm">
+                            <Folder className="mr-2 h-4 w-4" />
+                            Manage Categories
+                        </Button>
+                    </Link>
+                    <Link href="/admin/orders" passHref>
+                        <Button variant="outline" className="w-full justify-start text-sm col-span-2">
+                            <ListOrdered className="mr-2 h-4 w-4" />
+                            Manage Orders
+                        </Button>
+                    </Link>
+                </div>
             </CardContent>
         </Card>
       )}

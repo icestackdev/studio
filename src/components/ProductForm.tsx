@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { categories } from '@/lib/products';
+import { useCart } from '@/contexts/CartProvider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useState } from 'react';
 import Image from 'next/image';
@@ -33,6 +33,8 @@ interface ProductFormProps {
 }
 
 export function ProductForm({ onSubmit, onCancel, initialData }: ProductFormProps) {
+  const { state } = useCart();
+  const { categories } = state;
   const [imagePreviews, setImagePreviews] = useState<(string | null)[]>([null, null, null]);
   
   const form = useForm<ProductFormValues>({

@@ -3,7 +3,7 @@
 
 import React, { createContext, useReducer, useContext, ReactNode } from 'react';
 import type { CartItem, PreOrder, Product } from '@/lib/types';
-import { products } from '@/lib/products';
+import { products, categories as initialCategories } from '@/lib/products';
 
 const sampleOrders: PreOrder[] = [
     {
@@ -56,6 +56,7 @@ interface CartState {
   cartItems: CartItem[];
   preOrders: PreOrder[];
   shopName: string;
+  categories: string[];
 }
 
 type CartAction =
@@ -65,12 +66,15 @@ type CartAction =
   | { type: 'CONFIRM_PRE_ORDER'; payload: { customer: PreOrder['customer'] } }
   | { type: 'UPDATE_ORDER_STATUS'; payload: { orderId: string; status: PreOrder['status'] } }
   | { type: 'CLEAR_CART' }
-  | { type: 'UPDATE_SHOP_NAME'; payload: string };
+  | { type: 'UPDATE_SHOP_NAME'; payload: string }
+  | { type: 'ADD_CATEGORY'; payload: string }
+  | { type: 'DELETE_CATEGORY'; payload: string };
 
 const initialState: CartState = {
   cartItems: [],
   preOrders: sampleOrders,
   shopName: 'ThreadLine',
+  categories: initialCategories,
 };
 
 const CartContext = createContext<{
@@ -157,6 +161,19 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
             ...state,
             shopName: action.payload,
         };
+    }
+    case 'ADD_CATEGORY': {
+      if (state.categories.includes(action.payload)) return state;
+      return {
+        ...state,
+        categories: [...state.categories, action.payload]
+      };
+    }
+    case 'DELETE_CATEGORY': {
+      return {
+        ...state,
+        categories: state.categories.filter(cat => cat !== action.payload)
+      };
     }
     default:
       return state;
