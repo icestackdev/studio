@@ -6,14 +6,25 @@ import { ProductListItem } from '@/components/product-list-item';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { LayoutGrid, List } from 'lucide-react';
 import { useCart } from '@/contexts/CartProvider';
 
 export default function CategoriesPage() {
   const [layout, setLayout] = useState<'grid' | 'list'>('list');
   const { state } = useCart();
-  const { categories, products } = state;
+  const { products } = state;
+
+  const categories = useMemo(() => {
+    const categoryMap = new Map<string, any[]>();
+    products.forEach(product => {
+      if (!categoryMap.has(product.category)) {
+        categoryMap.set(product.category, []);
+      }
+      categoryMap.get(product.category)!.push(product);
+    });
+    return Array.from(categoryMap.entries());
+  }, [products]);
 
   return (
     <motion.div
@@ -31,8 +42,7 @@ export default function CategoriesPage() {
             </Button>
         </div>
 
-      {categories.map((category, index) => {
-        const categoryProducts = products.filter(p => p.category === category);
+      {categories.map(([category, categoryProducts], index) => {
         if (categoryProducts.length === 0) return null;
         return (
           <motion.div

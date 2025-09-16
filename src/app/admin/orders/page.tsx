@@ -9,28 +9,50 @@ import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isWithinInter
 import { Separator } from '@/components/ui/separator';
 import type { PreOrder } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Calendar, DollarSign, Package } from 'lucide-react';
+import { ArrowLeft, Calendar, DollarSign, Package, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { getOrders, updateOrderStatus } from '@/app/actions/order';
 import { useToast } from '@/hooks/use-toast';
 import type { Order } from '@prisma/client';
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 
 type PreOrderStatus = Order['status'];
 
 export default function ManageOrdersPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const [orders, setOrders] = useState<PreOrder[]>([]);
   const [period, setPeriod] = useState<'weekly' | 'monthly'>('weekly');
+  const [allOrders, setAllOrders] = useState<PreOrder[]>([]);
+
+  const {
+    items: orders,
+    hasMore,
+    isLoading,
+    lastItemRef,
+  } = useInfiniteScroll({
+    fetchFunction: getOrders as any,
+    limit: 5,
+  });
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    // This effect is to calculate summary stats from all orders, not just paginated ones
+    const fetchAllOrders = async () => {
+        let all: PreOrder[] = [];
+        let page = 1;
+        let hasMoreData = true;
+        while(hasMoreData) {
+            const fetchedOrders = await getOrders({ page, limit: 50 });
+            all = all.concat(fetchedOrders as PreOrder[]);
+            page++;
+            if (fetchedOrders.length < 50) {
+                hasMoreData = false;
+            }
+        }
+        setAllOrders(all);
+    };
+    fetchAllOrders();
+  }, [orders]);
 
-  const fetchOrders = async () => {
-    const fetchedOrders = await getOrders();
-    setOrders(fetchedOrders as PreOrder[]);
-  };
 
   const handleStatusChange = async (orderId: string, status: PreOrderStatus) => {
     try {
@@ -39,7 +61,7 @@ export default function ManageOrdersPage() {
         title: 'Order Status Updated',
         description: `Order ${orderId} has been updated to ${status}.`
       });
-      fetchOrders();
+      // We might need to refetch or update the state here. For now, user can refresh.
     } catch (error) {
       toast({
         variant: 'destructive',
@@ -47,8 +69,6 @@ export default function ManageOrdersPage() {
       });
     }
   };
-  
-  const reversedOrders = [...orders].reverse();
 
   const summaryStats = useMemo(() => {
     const now = new Date();
@@ -58,8 +78,8 @@ export default function ManageOrdersPage() {
     const monthlyStart = startOfMonth(now);
     const monthlyEnd = endOfMonth(now);
 
-    const weeklyOrders = orders.filter(o => isWithinInterval(new Date(o.date), { start: weeklyStart, end: weeklyEnd }));
-    const monthlyOrders = orders.filter(o => isWithinInterval(new Date(o.date), { start: monthlyStart, end: monthlyEnd }));
+    const weeklyOrders = allOrders.filter(o => isWithinInterval(new Date(o.date), { start: weeklyStart, end: weeklyEnd }));
+    const monthlyOrders = allOrders.filter(o => isWithinInterval(new Date(o.date), { start: monthlyStart, end: monthlyEnd }));
 
     const weeklyRevenue = weeklyOrders.reduce((acc, order) => acc + order.total, 0);
     const monthlyRevenue = monthlyOrders.reduce((acc, order) => acc + order.total, 0);
@@ -74,7 +94,7 @@ export default function ManageOrdersPage() {
         orders: monthlyOrders.length,
       }
     };
-  }, [orders]);
+  }, [allOrders]);
 
   const activeSummary = summaryStats[period];
   const periodLabel = period === 'weekly' ? 'This Week' : 'This Month';
@@ -135,48 +155,67 @@ export default function ManageOrdersPage() {
 
       <div className="space-y-4">
         <h2 className="text-base font-semibold">All Orders</h2>
-        {reversedOrders.map(order => (
-          <Card key={order.id}>
-            <CardHeader>
-              <CardTitle className="flex justify-between items-center text-sm">
-                <span>Order #{order.id.substring(0, 8)}</span>
-                <Badge variant={order.status === 'Pending' ? 'secondary' : 'default'}>{order.status}</Badge>
-              </CardTitle>
-              <div className="text-xs text-muted-foreground">
-                <p>{format(new Date(order.date), 'MMMM d, yyyy, h:mm a')}</p>
-                <p>{order.customer.name}</p>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <ul className="text-xs space-y-1">
-                {order.items.map(item => (
-                  <li key={item.id} className="flex justify-between">
-                    <span>{item.quantity}x {item.product.name} ({item.size})</span>
-                    <span>${(item.product.price * item.quantity).toFixed(2)}</span>
-                  </li>
-                ))}
-              </ul>
-              <Separator className="my-2" />
-              <div className="flex justify-between font-semibold text-sm">
-                <span>Total</span>
-                <span>${order.total.toFixed(2)}</span>
-              </div>
-               <div className="mt-4">
-                <p className="text-xs font-medium mb-2">Update Status</p>
-                <Select onValueChange={(value: PreOrderStatus) => handleStatusChange(order.id, value)} defaultValue={order.status}>
-                  <SelectTrigger className="text-xs">
-                    <SelectValue placeholder="Change status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Pending" className="text-xs">Pending</SelectItem>
-                    <SelectItem value="Confirmed" className="text-xs">Confirmed</SelectItem>
-                    <SelectItem value="Shipped" className="text-xs">Shipped</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
+        {orders.map((order, index) => (
+          <div key={order.id} ref={index === orders.length - 1 ? lastItemRef : null}>
+            <Card>
+                <CardHeader>
+                <CardTitle className="flex justify-between items-center text-sm">
+                    <span>Order #{order.id.substring(0, 8)}</span>
+                    <Badge variant={order.status === 'Pending' ? 'secondary' : 'default'}>{order.status}</Badge>
+                </CardTitle>
+                <div className="text-xs text-muted-foreground">
+                    <p>{format(new Date(order.date), 'MMMM d, yyyy, h:mm a')}</p>
+                    <p>{order.customer.name}</p>
+                </div>
+                </CardHeader>
+                <CardContent>
+                <ul className="text-xs space-y-1">
+                    {order.items.map(item => (
+                    <li key={item.id} className="flex justify-between">
+                        <span>{item.quantity}x {item.product.name} ({item.size})</span>
+                        <span>${(item.price * item.quantity).toFixed(2)}</span>
+                    </li>
+                    ))}
+                </ul>
+                <Separator className="my-2" />
+                 <div className="flex justify-between text-sm">
+                    <span>Subtotal</span>
+                    <span>${order.items.reduce((acc: number, item: any) => acc + item.price * item.quantity, 0).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                    <span>Delivery Fee</span>
+                    <span>${order.deliveryFee.toFixed(2)}</span>
+                </div>
+                <Separator className="my-2" />
+                <div className="flex justify-between font-semibold text-sm">
+                    <span>Total</span>
+                    <span>${order.total.toFixed(2)}</span>
+                </div>
+                <div className="mt-4">
+                    <p className="text-xs font-medium mb-2">Update Status</p>
+                    <Select onValueChange={(value: PreOrderStatus) => handleStatusChange(order.id, value)} defaultValue={order.status}>
+                    <SelectTrigger className="text-xs">
+                        <SelectValue placeholder="Change status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="Pending" className="text-xs">Pending</SelectItem>
+                        <SelectItem value="Confirmed" className="text-xs">Confirmed</SelectItem>
+                        <SelectItem value="Shipped" className="text-xs">Shipped</SelectItem>
+                    </SelectContent>
+                    </Select>
+                </div>
+                </CardContent>
+            </Card>
+          </div>
         ))}
+         {isLoading && (
+            <div className="flex justify-center items-center py-4">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+        )}
+        {!hasMore && orders.length > 0 && (
+            <p className="text-center text-sm text-muted-foreground py-4">No more orders to load.</p>
+        )}
       </div>
     </div>
   );

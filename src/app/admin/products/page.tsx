@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { ProductForm } from '@/components/ProductForm';
 import { Button } from '@/components/ui/button';
 import { ProductCard } from '@/components/product-card';
-import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2, Loader2 } from 'lucide-react';
 import type { Product } from '@/lib/types';
 import {
   AlertDialog,
@@ -23,30 +23,43 @@ import { getProducts, addProduct, updateProduct, deleteProduct } from '@/app/act
 import type { Category } from '@prisma/client';
 import { getCategories } from '@/app/actions/category';
 import { useToast } from '@/hooks/use-toast';
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 
 export default function ManageProductsPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isAdding, setIsAdding] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [productList, setProductList] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const {
+    items: productList,
+    hasMore,
+    isLoading,
+    lastItemRef,
+    reset,
+  } = useInfiniteScroll<Product>({
+    fetchFunction: getProducts,
+    limit: 6,
+  });
 
   useEffect(() => {
-    fetchData();
+    fetchCategories();
   }, []);
 
-  const fetchData = async () => {
-    const [products, categories] = await Promise.all([getProducts(), getCategories()]);
-    setProductList(products as Product[]);
-    setCategories(categories);
+  const fetchCategories = async () => {
+    const fetchedCategories = await getCategories();
+    setCategories(fetchedCategories);
+  }
+
+  const handleDataChange = () => {
+    reset();
   }
 
   const handleAddProduct = async (data: FormData) => {
     try {
       await addProduct(data);
       setIsAdding(false);
-      fetchData();
+      handleDataChange();
       toast({ title: 'Product added successfully' });
     } catch (error) {
       console.error(error);
@@ -59,7 +72,7 @@ export default function ManageProductsPage() {
     try {
       await updateProduct(editingProduct.id, data);
       setEditingProduct(null);
-      fetchData();
+      handleDataChange();
       toast({ title: 'Product updated successfully' });
     } catch (error) {
        console.error(error);
@@ -70,7 +83,7 @@ export default function ManageProductsPage() {
   const handleDeleteProduct = async (productId: string) => {
     try {
       await deleteProduct(productId);
-      fetchData();
+      handleDataChange();
       toast({ title: 'Product deleted successfully' });
     } catch (error) {
       toast({ variant: 'destructive', title: 'Error deleting product' });
@@ -114,15 +127,22 @@ export default function ManageProductsPage() {
          <ProductForm 
           onSubmit={handleEditProduct} 
           onCancel={() => setEditingProduct(null)}
-          initialData={editingProduct}
+          initialData={{
+            ...editingProduct,
+            sizes: Array.isArray(editingProduct.sizes) ? editingProduct.sizes.join(', ') : editingProduct.sizes,
+          }}
           categories={categories}
         />
       ) : (
         <>
           <Button onClick={() => setIsAdding(true)}>Add New Product</Button>
           <div className="grid grid-cols-2 gap-4">
-            {productList.map(product => (
-              <div key={product.id} className="relative group">
+            {productList.map((product, index) => (
+              <div 
+                key={product.id} 
+                className="relative group"
+                ref={index === productList.length - 1 ? lastItemRef : null}
+              >
                 <ProductCard product={product} />
                 <div className="absolute top-2 right-2 flex items-center gap-1 bg-background/80 backdrop-blur-sm rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleStartEdit(product)}>
@@ -151,6 +171,14 @@ export default function ManageProductsPage() {
               </div>
             ))}
           </div>
+          {isLoading && (
+            <div className="flex justify-center items-center py-4">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+        )}
+        {!hasMore && productList.length > 0 && (
+            <p className="text-center text-sm text-muted-foreground py-4">No more products to load.</p>
+        )}
         </>
       )}
     </div>

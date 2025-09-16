@@ -5,11 +5,16 @@ import prisma from "@/lib/prisma"
 import { revalidatePath } from "next/cache";
 import { uploadImage } from "@/services/cloudinary";
 
-export async function getProducts() {
+export async function getProducts({ page = 1, limit = 10 }: { page?: number, limit?: number } = {}) {
   const products = await prisma.product.findMany({
+    skip: (page - 1) * limit,
+    take: limit,
     include: {
       category: true,
       images: true,
+    },
+    orderBy: {
+      createdAt: 'desc',
     }
   });
   return products.map(p => ({

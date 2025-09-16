@@ -4,20 +4,28 @@
 import { useState } from 'react';
 import { ProductCard } from '@/components/product-card';
 import { ProductListItem } from '@/components/product-list-item';
-import { useCart } from '@/contexts/CartProvider';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, LayoutGrid, List } from 'lucide-react';
+import { ArrowRight, LayoutGrid, List, Loader2 } from 'lucide-react';
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
+import { getProducts } from './actions/product';
+import type { Product } from '@/lib/types';
 
 export default function HomePage() {
   const promoImage = PlaceHolderImages.find(img => img.id === 'promo-banner-1');
-  const [layout, setLayout] = useState<'grid' | 'list'>('list');
-  const { state } = useCart();
-  const { products } = state;
-  
+  const [layout, setLayout] = useState<'list' | 'list'>('list');
+  const {
+    items: products,
+    hasMore,
+    isLoading,
+    lastItemRef,
+  } = useInfiniteScroll<Product>({
+    fetchFunction: getProducts,
+    limit: 4,
+  });
 
   return (
     <motion.div
@@ -89,12 +97,13 @@ export default function HomePage() {
 
         {layout === 'grid' ? (
           <div className="grid grid-cols-2 gap-4">
-            {products.slice(0, 4).map((product, index) => (
+            {products.map((product, index) => (
               <motion.div
                 key={product.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
+                ref={index === products.length - 1 ? lastItemRef : null}
               >
                 <ProductCard product={product} />
               </motion.div>
@@ -102,17 +111,27 @@ export default function HomePage() {
           </div>
         ) : (
           <div className="space-y-4">
-            {products.slice(0, 4).map((product, index) => (
+            {products.map((product, index) => (
               <motion.div
                 key={product.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
+                ref={index === products.length - 1 ? lastItemRef : null}
               >
                 <ProductListItem product={product} />
               </motion.div>
             ))}
           </div>
+        )}
+
+        {isLoading && (
+            <div className="flex justify-center items-center py-4">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+        )}
+        {!hasMore && products.length > 0 && (
+            <p className="text-center text-sm text-muted-foreground py-4">You've reached the end.</p>
         )}
       </div>
     </motion.div>

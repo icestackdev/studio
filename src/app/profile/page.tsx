@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { User, ShoppingBag, Settings, ListOrdered, Package, Save, Folder, Truck } from 'lucide-react';
+import { User, ShoppingBag, Settings, ListOrdered, Package, Save, Folder, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -17,10 +17,9 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { getOrders } from '@/app/actions/order';
-import type { Order, OrderItem, Product as PrismaProduct, Category } from '@prisma/client';
 import { Skeleton } from '@/components/ui/skeleton';
-
-type OrderWithItems = Order & { items: (OrderItem & { product: PrismaProduct })[] };
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
+import type { PreOrder } from '@/lib/types';
 
 export default function ProfilePage() {
   const webApp = useTelegram();
@@ -30,10 +29,17 @@ export default function ProfilePage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [shopName, setShopName] = useState(state.shopName);
   const [deliveryFee, setDeliveryFee] = useState(state.deliveryFee.toString());
-  const [myOrders, setMyOrders] = useState<any[]>([]);
-  const [isLoadingOrders, setIsLoadingOrders] = useState(true);
-
   
+  const {
+    items: myOrders,
+    hasMore,
+    isLoading,
+    lastItemRef,
+  } = useInfiniteScroll<PreOrder>({
+    fetchFunction: getOrders as any,
+    limit: 5,
+  });
+
   useEffect(() => {
     setIsAdmin(true); // All users are admins as requested
     if (webApp?.initDataUnsafe?.user) {
@@ -44,18 +50,6 @@ export default function ProfilePage() {
       setUser(mockUser);
     }
   }, [webApp]);
-
-  useEffect(() => {
-    // This is a simple mock of fetching orders for the current user.
-    // In a real app, you would filter orders by user ID.
-    const fetchMyOrders = async () => {
-        setIsLoadingOrders(true);
-        const allOrders = await getOrders();
-        setMyOrders(allOrders);
-        setIsLoadingOrders(false);
-    };
-    fetchMyOrders();
-  }, []);
 
   const handleSaveShopName = async () => {
     try {
@@ -96,8 +90,6 @@ export default function ProfilePage() {
       })
     }
   };
-
-  const reversedOrders = [...myOrders].reverse();
 
   return (
     <motion.div
@@ -192,20 +184,21 @@ export default function ProfilePage() {
 
       <div>
         <h2 className="text-base font-semibold mb-4">My Pre-orders</h2>
-        {isLoadingOrders ? (
+        {myOrders.length === 0 && isLoading ? (
            <div className="space-y-4">
                 <Skeleton className="h-32 w-full rounded-lg" />
                 <Skeleton className="h-32 w-full rounded-lg" />
             </div>
-        ) : reversedOrders.length === 0 ? (
+        ) : myOrders.length === 0 && !isLoading ? (
           <div className="text-center py-16 text-muted-foreground">
             <ShoppingBag className="mx-auto h-12 w-12" />
             <p className="mt-4 text-sm">You have no pre-orders yet.</p>
           </div>
         ) : (
           <div className="space-y-4">
-            {reversedOrders.map(order => (
-              <Card key={order.id}>
+            {myOrders.map((order, index) => (
+              <div key={order.id} ref={index === myOrders.length - 1 ? lastItemRef : null}>
+              <Card>
                 <CardHeader>
                   <CardTitle className="flex justify-between items-center text-sm">
                     <span>Order #{order.id.substring(0,8)}</span>
@@ -238,7 +231,16 @@ export default function ProfilePage() {
                   </div>
                 </CardContent>
               </Card>
+              </div>
             ))}
+            {isLoading && (
+                <div className="flex justify-center items-center py-4">
+                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                </div>
+            )}
+            {!hasMore && myOrders.length > 0 && (
+                <p className="text-center text-sm text-muted-foreground py-4">No more orders to load.</p>
+            )}
           </div>
         )}
       </div>

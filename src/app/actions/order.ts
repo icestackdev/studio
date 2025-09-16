@@ -38,8 +38,10 @@ export async function createOrder({ customer, items, total, deliveryFee }: { cus
   return order;
 }
 
-export async function getOrders() {
+export async function getOrders({ page = 1, limit = 10 }: { page?: number, limit?: number } = {}) {
     const orders = await prisma.order.findMany({
+        skip: (page - 1) * limit,
+        take: limit,
         include: {
             items: {
                 include: {
