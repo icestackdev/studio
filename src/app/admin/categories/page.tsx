@@ -1,9 +1,8 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCart } from '@/contexts/CartProvider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -21,17 +20,27 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useToast } from '@/hooks/use-toast';
+import { addCategory, deleteCategory, getCategories, updateCategory } from '@/app/actions/category';
+import type { Category } from '@prisma/client';
 
 export default function ManageCategoriesPage() {
   const router = useRouter();
-  const { state, dispatch } = useCart();
-  const { categories } = state;
   const { toast } = useToast();
+  const [categories, setCategories] = useState<Category[]>([]);
   const [newCategory, setNewCategory] = useState('');
-  const [editingCategory, setEditingCategory] = useState<string | null>(null);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [editedName, setEditedName] = useState('');
 
-  const handleAddCategory = () => {
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    const fetchedCategories = await getCategories();
+    setCategories(fetchedCategories);
+  };
+
+  const handleAddCategory = async () => {
     if (newCategory.trim() === '') {
         toast({
             variant: 'destructive',
@@ -39,7 +48,7 @@ export default function ManageCategoriesPage() {
         });
         return;
     }
-    if (categories.includes(newCategory)) {
+    if (categories.some(c => c.name.toLowerCase() === newCategory.toLowerCase())) {
         toast({
             variant: 'destructive',
             title: 'Category already exists.',
@@ -47,25 +56,42 @@ export default function ManageCategoriesPage() {
         return;
     }
 
-    dispatch({ type: 'ADD_CATEGORY', payload: newCategory });
-    setNewCategory('');
-    toast({
-        title: 'Category Added',
-        description: `"${newCategory}" has been added.`,
-    });
+    try {
+        await addCategory(newCategory);
+        setNewCategory('');
+        toast({
+            title: 'Category Added',
+            description: `"${newCategory}" has been added.`,
+        });
+        fetchCategories();
+    } catch (error) {
+        toast({
+            variant: 'destructive',
+            title: 'Error adding category.',
+        });
+    }
   };
 
-  const handleDeleteCategory = (category: string) => {
-    dispatch({ type: 'DELETE_CATEGORY', payload: category });
-    toast({
-        title: 'Category Deleted',
-        description: `"${category}" has been deleted.`,
-    });
+  const handleDeleteCategory = async (category: Category) => {
+    try {
+      await deleteCategory(category.id);
+      toast({
+          title: 'Category Deleted',
+          description: `"${category.name}" has been deleted.`,
+      });
+      fetchCategories();
+    } catch (error) {
+       toast({
+            variant: 'destructive',
+            title: 'Error deleting category.',
+            description: 'Make sure no products are using this category.',
+        });
+    }
   };
 
-  const handleStartEdit = (category: string) => {
+  const handleStartEdit = (category: Category) => {
     setEditingCategory(category);
-    setEditedName(category);
+    setEditedName(category.name);
   };
   
   const handleCancelEdit = () => {
@@ -73,7 +99,7 @@ export default function ManageCategoriesPage() {
     setEditedName('');
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (!editingCategory) return;
     if (editedName.trim() === '') {
         toast({
@@ -82,7 +108,7 @@ export default function ManageCategoriesPage() {
         });
         return;
     }
-    if (categories.includes(editedName) && editedName !== editingCategory) {
+    if (categories.some(c => c.name.toLowerCase() === editedName.toLowerCase() && c.id !== editingCategory.id)) {
         toast({
             variant: 'destructive',
             title: 'Category already exists.',
@@ -90,12 +116,20 @@ export default function ManageCategoriesPage() {
         return;
     }
 
-    dispatch({ type: 'EDIT_CATEGORY', payload: { oldName: editingCategory, newName: editedName } });
-    toast({
-        title: 'Category Updated',
-        description: `"${editingCategory}" has been changed to "${editedName}".`
-    });
-    handleCancelEdit();
+    try {
+        await updateCategory(editingCategory.id, editedName);
+        toast({
+            title: 'Category Updated',
+            description: `"${editingCategory.name}" has been changed to "${editedName}".`
+        });
+        handleCancelEdit();
+        fetchCategories();
+    } catch (error) {
+        toast({
+            variant: 'destructive',
+            title: 'Error updating category.',
+        });
+    }
   };
 
   return (
@@ -143,8 +177,8 @@ export default function ManageCategoriesPage() {
           ) : (
             <ul className="space-y-2">
               {categories.map(category => (
-                <li key={category} className="flex items-center justify-between p-2 border rounded-md min-h-[48px]">
-                  {editingCategory === category ? (
+                <li key={category.id} className="flex items-center justify-between p-2 border rounded-md min-h-[48px]">
+                  {editingCategory?.id === category.id ? (
                     <div className="flex-1 flex items-center gap-2">
                       <Input 
                         value={editedName}
@@ -160,7 +194,7 @@ export default function ManageCategoriesPage() {
                     </div>
                   ) : (
                     <>
-                      <span className="text-sm">{category}</span>
+                      <span className="text-sm">{category.name}</span>
                       <div className="flex items-center">
                         <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleStartEdit(category)}>
                           <Edit className="h-4 w-4" />

@@ -16,6 +16,8 @@ import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { getOrders } from '@/app/actions/order';
+import type { PreOrder } from '@/lib/types';
 
 export default function ProfilePage() {
   const webApp = useTelegram();
@@ -24,6 +26,8 @@ export default function ProfilePage() {
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [shopName, setShopName] = useState(state.shopName);
+  const [myOrders, setMyOrders] = useState<PreOrder[]>([]);
+
   
   useEffect(() => {
     setIsAdmin(true); // All users are admins as requested
@@ -36,6 +40,16 @@ export default function ProfilePage() {
     }
   }, [webApp]);
 
+  useEffect(() => {
+    // This is a simple mock of fetching orders for the current user.
+    // In a real app, you would filter orders by user ID.
+    const fetchMyOrders = async () => {
+        const allOrders = await getOrders();
+        setMyOrders(allOrders as PreOrder[]);
+    };
+    fetchMyOrders();
+  }, [state.preOrders]);
+
   const handleSaveShopName = () => {
     dispatch({ type: 'UPDATE_SHOP_NAME', payload: shopName });
     toast({
@@ -44,7 +58,7 @@ export default function ProfilePage() {
     })
   };
 
-  const reversedOrders = [...state.preOrders].reverse();
+  const reversedOrders = [...myOrders].reverse();
 
   return (
     <motion.div
@@ -131,10 +145,10 @@ export default function ProfilePage() {
               <Card key={order.id}>
                 <CardHeader>
                   <CardTitle className="flex justify-between items-center text-sm">
-                    <span>Order {order.id}</span>
+                    <span>Order #{order.id.substring(0,8)}</span>
                     <Badge variant={order.status === 'Pending' ? 'secondary' : 'default'}>{order.status}</Badge>
                   </CardTitle>
-                  <p className="text-xs text-muted-foreground">{format(order.date, 'MMMM d, yyyy')}</p>
+                  <p className="text-xs text-muted-foreground">{format(new Date(order.date), 'MMMM d, yyyy')}</p>
                 </CardHeader>
                 <CardContent>
                   <ul className="text-xs space-y-1">

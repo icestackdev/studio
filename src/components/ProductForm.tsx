@@ -8,71 +8,59 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { useCart } from '@/contexts/CartProvider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useState } from 'react';
 import Image from 'next/image';
+import type { Category } from '@prisma/client';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   description: z.string().min(10, { message: "Description must be at least 10 characters." }),
   price: z.coerce.number().min(0.01, { message: "Price must be greater than 0." }),
-  category: z.string().min(1, { message: "Please select a category." }),
+  categoryId: z.string().min(1, { message: "Please select a category." }),
   sizes: z.string().min(1, { message: "Please enter at least one size, comma-separated." }),
-  image1: z.any().optional(),
-  image2: z.any().optional(),
-  image3: z.any().optional(),
+  images: z.string().optional().describe("Image URLs, comma-separated"),
 });
 
 type ProductFormValues = z.infer<typeof formSchema>;
 
 interface ProductFormProps {
-  onSubmit: (data: ProductFormValues & { imageUrls?: string[] }) => void;
+  onSubmit: (data: ProductFormValues) => void;
   onCancel: () => void;
-  initialData?: Partial<ProductFormValues>;
+  initialData?: Partial<ProductFormValues & { category: string }>;
+  categories: Category[];
 }
 
-export function ProductForm({ onSubmit, onCancel, initialData }: ProductFormProps) {
-  const { state } = useCart();
-  const { categories } = state;
-  const [imagePreviews, setImagePreviews] = useState<(string | null)[]>([null, null, null]);
+export function ProductForm({ onSubmit, onCancel, initialData, categories }: ProductFormProps) {
   
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData || {
+    defaultValues: initialData ? {
+        name: initialData.name,
+        description: initialData.description,
+        price: initialData.price,
+        categoryId: initialData.categoryId,
+        sizes: Array.isArray(initialData.sizes) ? initialData.sizes.join(', ') : '',
+        images: Array.isArray(initialData.images) ? initialData.images.map(i => i.url).join(', ') : '',
+    } : {
       name: '',
       description: '',
       price: 0,
-      category: '',
+      categoryId: '',
       sizes: '',
+      images: '',
     },
   });
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const newPreviews = [...imagePreviews];
-        newPreviews[index] = reader.result as string;
-        setImagePreviews(newPreviews);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      const newPreviews = [...imagePreviews];
-      newPreviews[index] = null;
-      setImagePreviews(newPreviews);
-    }
-  };
-  
+  const imagesValue = form.watch('images');
+  const imagePreviews = imagesValue ? imagesValue.split(',').map(url => url.trim()).filter(url => url) : [];
+
   const handleSubmit = (data: ProductFormValues) => {
     onSubmit({
         ...data,
-        sizes: data.sizes.split(',').map(s => s.trim()).filter(s => s),
-        imageUrls: imagePreviews.filter((url): url is string => url !== null),
+        sizes: data.sizes,
     });
   };
-
 
   return (
     <Form {...form}>
@@ -118,7 +106,7 @@ export function ProductForm({ onSubmit, onCancel, initialData }: ProductFormProp
         />
         <FormField
           control={form.control}
-          name="category"
+          name="categoryId"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Category</FormLabel>
@@ -130,7 +118,7 @@ export function ProductForm({ onSubmit, onCancel, initialData }: ProductFormProp
                 </FormControl>
                 <SelectContent>
                   {categories.map(cat => (
-                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                    <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -152,27 +140,21 @@ export function ProductForm({ onSubmit, onCancel, initialData }: ProductFormProp
           )}
         />
         
-        <div className="space-y-4">
-            <FormLabel>Product Images</FormLabel>
-            {[...Array(3)].map((_, index) => (
-                <FormField
-                    key={index}
-                    control={form.control}
-                    name={`image${index + 1}` as 'image1' | 'image2' | 'image3'}
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel className="text-xs">Image {index + 1}</FormLabel>
-                            <FormControl>
-                                <Input type="file" accept="image/*" onChange={(e) => handleImageChange(e, index)} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-            ))}
-        </div>
+        <FormField
+          control={form.control}
+          name="images"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Product Images</FormLabel>
+               <FormControl>
+                <Textarea placeholder="Enter image URLs, separated by commas" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-        <div className="flex gap-4 mt-4">
+        <div className="flex gap-4 mt-4 flex-wrap">
             {imagePreviews.map((preview, index) => (
                 preview && (
                     <div key={index} className="mt-2">

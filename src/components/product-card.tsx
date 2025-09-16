@@ -2,7 +2,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Product } from '@/lib/types';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Card, CardContent } from '@/components/ui/card';
 import { motion } from 'framer-motion';
 import { ImageIcon } from 'lucide-react';
@@ -12,9 +11,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const primaryImage = product.images && product.images.length > 0
-    ? PlaceHolderImages.find(img => img.id === product.images[0].id)
-    : null;
+  const primaryImage = product.images && product.images.length > 0 ? product.images[0] : null;
 
   return (
     <motion.div
@@ -27,11 +24,11 @@ export function ProductCard({ product }: ProductCardProps) {
           <div className="relative w-full aspect-[3/4] bg-muted overflow-hidden">
             {primaryImage ? (
               <Image
-                src={primaryImage.imageUrl}
+                src={primaryImage.url}
                 alt={product.name}
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
-                data-ai-hint={primaryImage.imageHint}
+                data-ai-hint={primaryImage.hint}
               />
             ) : (
               <div className="flex items-center justify-center h-full">

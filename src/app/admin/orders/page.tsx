@@ -1,8 +1,7 @@
 
 "use client";
 
-import { useState, useMemo } from 'react';
-import { useCart } from '@/contexts/CartProvider';
+import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
@@ -12,18 +11,41 @@ import type { PreOrder } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Calendar, DollarSign, Package } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { getOrders, updateOrderStatus } from '@/app/actions/order';
+import { useToast } from '@/hooks/use-toast';
+import type { Order } from '@prisma/client';
+
+type PreOrderStatus = Order['status'];
 
 export default function ManageOrdersPage() {
-  const { state, dispatch } = useCart();
   const router = useRouter();
-  const [orders, setOrders] = useState<PreOrder[]>(state.preOrders);
+  const { toast } = useToast();
+  const [orders, setOrders] = useState<PreOrder[]>([]);
   const [period, setPeriod] = useState<'weekly' | 'monthly'>('weekly');
 
-  const handleStatusChange = (orderId: string, status: PreOrder['status']) => {
-    setOrders(orders.map(order => 
-      order.id === orderId ? { ...order, status } : order
-    ));
-    // dispatch({ type: 'UPDATE_ORDER_STATUS', payload: { orderId, status } });
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const fetchOrders = async () => {
+    const fetchedOrders = await getOrders();
+    setOrders(fetchedOrders as PreOrder[]);
+  };
+
+  const handleStatusChange = async (orderId: string, status: PreOrderStatus) => {
+    try {
+      await updateOrderStatus(orderId, status);
+      toast({
+        title: 'Order Status Updated',
+        description: `Order ${orderId} has been updated to ${status}.`
+      });
+      fetchOrders();
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Error updating order status',
+      });
+    }
   };
   
   const reversedOrders = [...orders].reverse();
@@ -36,8 +58,8 @@ export default function ManageOrdersPage() {
     const monthlyStart = startOfMonth(now);
     const monthlyEnd = endOfMonth(now);
 
-    const weeklyOrders = orders.filter(o => isWithinInterval(o.date, { start: weeklyStart, end: weeklyEnd }));
-    const monthlyOrders = orders.filter(o => isWithinInterval(o.date, { start: monthlyStart, end: monthlyEnd }));
+    const weeklyOrders = orders.filter(o => isWithinInterval(new Date(o.date), { start: weeklyStart, end: weeklyEnd }));
+    const monthlyOrders = orders.filter(o => isWithinInterval(new Date(o.date), { start: monthlyStart, end: monthlyEnd }));
 
     const weeklyRevenue = weeklyOrders.reduce((acc, order) => acc + order.total, 0);
     const monthlyRevenue = monthlyOrders.reduce((acc, order) => acc + order.total, 0);
@@ -117,11 +139,11 @@ export default function ManageOrdersPage() {
           <Card key={order.id}>
             <CardHeader>
               <CardTitle className="flex justify-between items-center text-sm">
-                <span>Order {order.id}</span>
+                <span>Order #{order.id.substring(0, 8)}</span>
                 <Badge variant={order.status === 'Pending' ? 'secondary' : 'default'}>{order.status}</Badge>
               </CardTitle>
               <div className="text-xs text-muted-foreground">
-                <p>{format(order.date, 'MMMM d, yyyy, h:mm a')}</p>
+                <p>{format(new Date(order.date), 'MMMM d, yyyy, h:mm a')}</p>
                 <p>{order.customer.name}</p>
               </div>
             </CardHeader>
@@ -141,7 +163,7 @@ export default function ManageOrdersPage() {
               </div>
                <div className="mt-4">
                 <p className="text-xs font-medium mb-2">Update Status</p>
-                <Select onValueChange={(value: PreOrder['status']) => handleStatusChange(order.id, value)} defaultValue={order.status}>
+                <Select onValueChange={(value: PreOrderStatus) => handleStatusChange(order.id, value)} defaultValue={order.status}>
                   <SelectTrigger className="text-xs">
                     <SelectValue placeholder="Change status" />
                   </SelectTrigger>

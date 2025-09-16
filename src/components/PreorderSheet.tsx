@@ -14,6 +14,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useCart } from '@/contexts/CartProvider';
 import { useToast } from '@/hooks/use-toast';
 import { useTelegram } from '@/hooks/useTelegram';
+import { createOrder } from '@/app/actions/order';
+import type { CustomerInfo } from '@/lib/types';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -55,17 +57,38 @@ export function PreorderSheet({ open, onOpenChange }: PreorderSheetProps) {
     }
   }, [open, webApp, form]);
 
-  const onSubmit = (data: PreorderFormValues) => {
+  const onSubmit = async (data: PreorderFormValues) => {
     setIsSubmitting(true);
-    dispatch({ type: 'CONFIRM_PRE_ORDER', payload: { customer: data } });
-    setTimeout(() => {
+    
+    const total = state.cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+    const orderItems = state.cartItems.map(item => ({
+        productId: item.product.id,
+        quantity: item.quantity,
+        size: item.size,
+        price: item.product.price,
+    }));
+
+    try {
+        await createOrder({ customer: data as CustomerInfo, items: orderItems, total });
+        
+        dispatch({ type: 'CLEAR_CART' });
+
         toast({
             title: 'Pre-order Placed!',
             description: 'Your order has been confirmed. Check your profile for details.',
         });
         setIsSubmitting(false);
         onOpenChange(false);
-    }, 1000);
+
+    } catch(error) {
+        console.error(error);
+        toast({
+            variant: 'destructive',
+            title: 'Failed to place pre-order.',
+            description: 'Please try again later.',
+        });
+        setIsSubmitting(false);
+    }
   };
 
   return (

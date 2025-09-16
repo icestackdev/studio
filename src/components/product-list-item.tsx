@@ -2,9 +2,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Product } from '@/lib/types';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { ChevronRight, ImageIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -14,7 +12,7 @@ interface ProductListItemProps {
 
 export function ProductListItem({ product }: ProductListItemProps) {
   const primaryImage = product.images && product.images.length > 0
-    ? PlaceHolderImages.find(img => img.id === product.images[0].id)
+    ? product.images[0]
     : null;
 
   return (
@@ -28,11 +26,11 @@ export function ProductListItem({ product }: ProductListItemProps) {
              <div className="relative w-24 h-24 bg-muted overflow-hidden rounded-md shrink-0">
                 {primaryImage ? (
                 <Image
-                    src={primaryImage.imageUrl}
+                    src={primaryImage.url}
                     alt={product.name}
                     fill
                     className="object-cover"
-                    data-ai-hint={primaryImage.imageHint}
+                    data-ai-hint={primaryImage.hint}
                 />
                 ) : (
                 <div className="flex items-center justify-center h-full">

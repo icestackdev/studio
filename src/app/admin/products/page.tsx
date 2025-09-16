@@ -1,15 +1,13 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ProductForm } from '@/components/ProductForm';
 import { Button } from '@/components/ui/button';
-import { useCart } from '@/contexts/CartProvider';
 import { ProductCard } from '@/components/product-card';
 import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
 import type { Product } from '@/lib/types';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,77 +19,62 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { getProducts, addProduct, updateProduct, deleteProduct } from '@/app/actions/product';
+import type { Product as PrismaProduct, Category } from '@prisma/client';
+import { getCategories } from '@/app/actions/category';
+import { useToast } from '@/hooks/use-toast';
 
 export default function ManageProductsPage() {
   const router = useRouter();
-  const { state } = useCart();
+  const { toast } = useToast();
   const [isAdding, setIsAdding] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [productList, setProductList] = useState(state.products);
+  const [productList, setProductList] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
-  const handleAddProduct = (data: any & { imageUrls?: string[] }) => {
-    const newProductId = `${productList.length + 1}`;
-    let newImages = [];
-    if(data.imageUrls && data.imageUrls.length > 0) {
-        newImages = data.imageUrls.map((imageUrl: string, index: number) => {
-            const newImageId = `product-${newProductId}-${index + 1}`;
-            // This is a temporary solution for local state.
-            // In a real app, you would upload this to a storage service.
-            PlaceHolderImages.push({
-                id: newImageId,
-                description: data.name,
-                imageUrl: imageUrl,
-                imageHint: data.name.toLowerCase().split(' ').slice(0,2).join(' '),
-            });
-            return { id: newImageId, hint: data.name.toLowerCase() };
-        });
-    }
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-    const newProduct: Product = {
-      id: newProductId,
-      name: data.name,
-      description: data.description,
-      price: data.price,
-      category: data.category,
-      sizes: data.sizes,
-      images: newImages,
-    };
-    setProductList([newProduct, ...productList]);
-    setIsAdding(false);
-  };
-  
-  const handleEditProduct = (data: any & { imageUrls?: string[] }) => {
-    if (!editingProduct) return;
-
-    let newImages = [];
-    if(data.imageUrls && data.imageUrls.length > 0) {
-        newImages = data.imageUrls.map((imageUrl: string, index: number) => {
-            const newImageId = `product-${editingProduct.id}-${index + 1}`;
-            PlaceHolderImages.push({
-                id: newImageId,
-                description: data.name,
-                imageUrl: imageUrl,
-                imageHint: data.name.toLowerCase().split(' ').slice(0,2).join(' '),
-            });
-            return { id: newImageId, hint: data.name.toLowerCase() };
-        });
-    }
-
-    const updatedProduct: Product = {
-      ...editingProduct,
-      name: data.name,
-      description: data.description,
-      price: data.price,
-      category: data.category,
-      sizes: data.sizes,
-      images: newImages.length > 0 ? newImages : editingProduct.images,
-    };
-    setProductList(productList.map(p => p.id === editingProduct.id ? updatedProduct : p));
-    setEditingProduct(null);
+  const fetchData = async () => {
+    const [products, categories] = await Promise.all([getProducts(), getCategories()]);
+    setProductList(products as Product[]);
+    setCategories(categories);
   }
 
-  const handleDeleteProduct = (productId: string) => {
-    setProductList(productList.filter(p => p.id !== productId));
+  const handleAddProduct = async (data: any) => {
+    try {
+      await addProduct(data);
+      setIsAdding(false);
+      fetchData();
+      toast({ title: 'Product added successfully' });
+    } catch (error) {
+      console.error(error);
+      toast({ variant: 'destructive', title: 'Error adding product' });
+    }
+  };
+  
+  const handleEditProduct = async (data: any) => {
+    if (!editingProduct) return;
+    try {
+      await updateProduct(editingProduct.id, data);
+      setEditingProduct(null);
+      fetchData();
+      toast({ title: 'Product updated successfully' });
+    } catch (error) {
+       console.error(error);
+      toast({ variant: 'destructive', title: 'Error updating product' });
+    }
+  }
+
+  const handleDeleteProduct = async (productId: string) => {
+    try {
+      await deleteProduct(productId);
+      fetchData();
+      toast({ title: 'Product deleted successfully' });
+    } catch (error) {
+      toast({ variant: 'destructive', title: 'Error deleting product' });
+    }
   };
   
   const handleStartEdit = (product: Product) => {
@@ -117,7 +100,7 @@ export default function ManageProductsPage() {
             }}
         >
             <ArrowLeft className="h-5 w-5" />
-            <span className="ml-1">{formInProgress ? 'Back' : 'Back'}</span>
+            <span className="ml-1">{formInProgress ? 'Cancel' : 'Back'}</span>
         </Button>
         <h1 className="text-lg font-bold">Manage Products</h1>
       </div>
@@ -126,12 +109,14 @@ export default function ManageProductsPage() {
         <ProductForm 
           onSubmit={handleAddProduct} 
           onCancel={() => setIsAdding(false)} 
+          categories={categories}
         />
       ) : editingProduct ? (
          <ProductForm 
           onSubmit={handleEditProduct} 
           onCancel={() => setEditingProduct(null)}
           initialData={editingProduct}
+          categories={categories}
         />
       ) : (
         <>
