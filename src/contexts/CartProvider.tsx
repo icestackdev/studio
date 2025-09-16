@@ -13,6 +13,7 @@ interface CartState {
   cartItems: CartItem[];
   preOrders: PreOrder[];
   shopName: string;
+  deliveryFee: number;
   categories: string[];
   products: Product[];
 }
@@ -24,13 +25,15 @@ type CartAction =
   | { type: 'CONFIRM_PRE_ORDER'; payload: { customer: PreOrder['customer'], total: number } }
   | { type: 'CLEAR_CART' }
   | { type: 'SET_SHOP_NAME'; payload: string }
-  | { type: 'SET_INITIAL_DATA'; payload: { products: Product[], categories: string[], orders: PreOrder[], shopName: string } };
+  | { type: 'SET_DELIVERY_FEE'; payload: number }
+  | { type: 'SET_INITIAL_DATA'; payload: { products: Product[], categories: string[], orders: PreOrder[], shopName: string, deliveryFee: number } };
 
 
 const initialState: CartState = {
   cartItems: [],
   preOrders: [],
   shopName: 'ThreadLine',
+  deliveryFee: 0,
   categories: [],
   products: [],
 };
@@ -39,6 +42,7 @@ const CartContext = createContext<{
   state: CartState;
   dispatch: React.Dispatch<CartAction>;
   updateShopName: (newName: string) => Promise<void>;
+  updateDeliveryFee: (newFee: number) => Promise<void>;
 } | undefined>(undefined);
 
 const cartReducer = (state: CartState, action: CartAction): CartState => {
@@ -50,6 +54,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
             categories: action.payload.categories,
             preOrders: action.payload.orders,
             shopName: action.payload.shopName,
+            deliveryFee: action.payload.deliveryFee,
         };
     case 'ADD_TO_CART': {
       const { product, size, quantity } = action.payload;
@@ -103,6 +108,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
         date: new Date(),
         status: 'Pending',
         total: action.payload.total,
+        deliveryFee: state.deliveryFee,
       };
 
       return {
@@ -117,6 +123,12 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
             shopName: action.payload,
         };
     }
+    case 'SET_DELIVERY_FEE': {
+        return {
+            ...state,
+            deliveryFee: action.payload,
+        };
+    }
     default:
       return state;
   }
@@ -129,17 +141,19 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     async function fetchData() {
         try {
-            const [products, categories, orders, shopName] = await Promise.all([
+            const [products, categories, orders, shopNameSetting, deliveryFeeSetting] = await Promise.all([
                 getProducts(),
                 getCategories(),
                 getOrders(),
                 getSetting('shopName'),
+                getSetting('deliveryFee'),
             ]);
             dispatch({ type: 'SET_INITIAL_DATA', payload: { 
                 products, 
                 categories: categories.map(c => c.name),
                 orders: orders as PreOrder[],
-                shopName: shopName?.value || 'ThreadLine',
+                shopName: shopNameSetting?.value || 'ThreadLine',
+                deliveryFee: deliveryFeeSetting ? parseFloat(deliveryFeeSetting.value) : 0,
             } });
         } catch (error) {
             console.error("Failed to fetch initial data", error);
@@ -154,13 +168,18 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     await updateSetting('shopName', newName);
     dispatch({ type: 'SET_SHOP_NAME', payload: newName });
   };
+  
+  const updateDeliveryFee = async (newFee: number) => {
+    await updateSetting('deliveryFee', newFee.toString());
+    dispatch({ type: 'SET_DELIVERY_FEE', payload: newFee });
+  };
 
   if (loading) {
     return <AppSkeleton />;
   }
 
   return (
-    <CartContext.Provider value={{ state, dispatch, updateShopName }}>
+    <CartContext.Provider value={{ state, dispatch, updateShopName, updateDeliveryFee }}>
       {children}
     </CartContext.Provider>
   );

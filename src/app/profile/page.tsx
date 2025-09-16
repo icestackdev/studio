@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { User, ShoppingBag, Settings, ListOrdered, Package, Save, Folder } from 'lucide-react';
+import { User, ShoppingBag, Settings, ListOrdered, Package, Save, Folder, Truck } from 'lucide-react';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -24,11 +24,12 @@ type OrderWithItems = Order & { items: (OrderItem & { product: PrismaProduct })[
 
 export default function ProfilePage() {
   const webApp = useTelegram();
-  const { state, updateShopName } = useCart();
+  const { state, updateShopName, updateDeliveryFee } = useCart();
   const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [shopName, setShopName] = useState(state.shopName);
+  const [deliveryFee, setDeliveryFee] = useState(state.deliveryFee.toString());
   const [myOrders, setMyOrders] = useState<any[]>([]);
   const [isLoadingOrders, setIsLoadingOrders] = useState(true);
 
@@ -67,6 +68,31 @@ export default function ProfilePage() {
       toast({
         variant: 'destructive',
         title: 'Error updating shop name.'
+      })
+    }
+  };
+
+  const handleSaveDeliveryFee = async () => {
+    const fee = parseFloat(deliveryFee);
+    if(isNaN(fee) || fee < 0) {
+       toast({
+        variant: 'destructive',
+        title: 'Invalid amount.',
+        description: 'Please enter a valid, non-negative number for the delivery fee.'
+      });
+      return;
+    }
+
+    try {
+      await updateDeliveryFee(fee);
+      toast({
+        title: 'Delivery Fee Updated',
+        description: `The delivery fee has been set to $${fee.toFixed(2)}.`
+      });
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Error updating delivery fee.'
       })
     }
   };
@@ -112,6 +138,25 @@ export default function ProfilePage() {
                             className="text-sm"
                         />
                         <Button size="icon" onClick={handleSaveShopName}>
+                            <Save className="h-4 w-4" />
+                        </Button>
+                    </div>
+                </div>
+
+                 <div className="space-y-2">
+                    <Label htmlFor="deliveryFee" className="text-sm">Delivery Fee</Label>
+                    <div className="flex items-center gap-2">
+                         <div className="relative w-full">
+                            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">$</span>
+                            <Input 
+                                id="deliveryFee"
+                                type="number"
+                                value={deliveryFee} 
+                                onChange={(e) => setDeliveryFee(e.target.value)}
+                                className="pl-6 text-sm"
+                            />
+                        </div>
+                        <Button size="icon" onClick={handleSaveDeliveryFee}>
                             <Save className="h-4 w-4" />
                         </Button>
                     </div>
@@ -177,6 +222,15 @@ export default function ProfilePage() {
                       </li>
                     ))}
                   </ul>
+                  <Separator className="my-2" />
+                  <div className="flex justify-between text-sm">
+                      <span>Subtotal</span>
+                      <span>${order.items.reduce((acc: number, item: any) => acc + item.price * item.quantity, 0).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                      <span>Delivery Fee</span>
+                      <span>${order.deliveryFee.toFixed(2)}</span>
+                  </div>
                   <Separator className="my-2" />
                   <div className="flex justify-between font-semibold text-sm">
                     <span>Total</span>

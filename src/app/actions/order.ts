@@ -13,7 +13,7 @@ type OrderItemInput = {
     price: number;
 }
 
-export async function createOrder({ customer, items, total }: { customer: CustomerInfo, items: OrderItemInput[], total: number }) {
+export async function createOrder({ customer, items, total, deliveryFee }: { customer: CustomerInfo, items: OrderItemInput[], total: number, deliveryFee: number }) {
   const order = await prisma.order.create({
     data: {
       customerName: customer.name,
@@ -21,6 +21,7 @@ export async function createOrder({ customer, items, total }: { customer: Custom
       customerAddress: customer.address,
       customerNotes: customer.notes,
       total,
+      deliveryFee,
       status: 'Pending',
       items: {
         create: items.map(item => ({

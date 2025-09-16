@@ -9,12 +9,15 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Minus, Plus, Trash2, ShoppingBag, ImageIcon } from 'lucide-react';
 import { PreorderSheet } from '@/components/PreorderSheet';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Separator } from '@/components/ui/separator';
 
 export default function CartPage() {
   const { state, dispatch } = useCart();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
-  const total = state.cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  const subtotal = state.cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  const deliveryFee = state.deliveryFee;
+  const total = subtotal + deliveryFee;
 
   const handleQuantityChange = (cartItemId: string, quantity: number) => {
     dispatch({ type: 'UPDATE_QUANTITY', payload: { cartItemId, quantity } });
@@ -78,14 +81,25 @@ export default function CartPage() {
                 );
               })}
             </AnimatePresence>
-            <div className="pt-4 space-y-4">
-              <div className="flex justify-between font-bold text-lg">
-                <span>Total</span>
-                <span>${total.toFixed(2)}</span>
-              </div>
-              <Button className="w-full" size="lg" onClick={() => setIsSheetOpen(true)}>
-                Place Pre-order
-              </Button>
+            <div className="pt-4 space-y-2">
+                <div className="flex justify-between text-base">
+                    <span>Subtotal</span>
+                    <span>${subtotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-base">
+                    <span>Delivery Fee</span>
+                    <span>${deliveryFee.toFixed(2)}</span>
+                </div>
+                <Separator />
+                <div className="flex justify-between font-bold text-lg">
+                    <span>Total</span>
+                    <span>${total.toFixed(2)}</span>
+                </div>
+                <div className="pt-2">
+                    <Button className="w-full" size="lg" onClick={() => setIsSheetOpen(true)}>
+                        Place Pre-order
+                    </Button>
+                </div>
             </div>
           </div>
         )}

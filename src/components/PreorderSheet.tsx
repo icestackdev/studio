@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useTelegram } from '@/hooks/useTelegram';
 import { createOrder } from '@/app/actions/order';
 import type { CustomerInfo } from '@/lib/types';
+import { Separator } from './ui/separator';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -57,10 +58,13 @@ export function PreorderSheet({ open, onOpenChange }: PreorderSheetProps) {
     }
   }, [open, webApp, form]);
 
+  const subtotal = state.cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  const deliveryFee = state.deliveryFee;
+  const total = subtotal + deliveryFee;
+
   const onSubmit = async (data: PreorderFormValues) => {
     setIsSubmitting(true);
     
-    const total = state.cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
     const orderItems = state.cartItems.map(item => ({
         productId: item.product.id,
         quantity: item.quantity,
@@ -69,7 +73,7 @@ export function PreorderSheet({ open, onOpenChange }: PreorderSheetProps) {
     }));
 
     try {
-        await createOrder({ customer: data as CustomerInfo, items: orderItems, total });
+        await createOrder({ customer: data as CustomerInfo, items: orderItems, total, deliveryFee });
         
         dispatch({ type: 'CLEAR_CART' });
 
@@ -154,10 +158,27 @@ export function PreorderSheet({ open, onOpenChange }: PreorderSheetProps) {
                 </FormItem>
               )}
             />
+
+            <div className="pt-2 space-y-2">
+                <Separator />
+                <div className="flex justify-between text-base">
+                    <span>Subtotal</span>
+                    <span>${subtotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-base">
+                    <span>Delivery Fee</span>
+                    <span>${deliveryFee.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between font-bold text-lg">
+                    <span>Total</span>
+                    <span>${total.toFixed(2)}</span>
+                </div>
+            </div>
+
              <SheetFooter className="gap-2 sm:justify-end pt-2">
-                <Button type="submit" disabled={isSubmitting} size="sm" className='w-full'>
+                <Button type="submit" disabled={isSubmitting} size="lg" className='w-full'>
                     {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Confirm Pre-order
+                    Confirm Pre-order for ${total.toFixed(2)}
                 </Button>
             </SheetFooter>
           </form>

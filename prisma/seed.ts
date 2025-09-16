@@ -17,6 +17,16 @@ async function main() {
   });
   console.log('Created default shop name setting');
 
+  await prisma.settings.upsert({
+    where: { key: 'deliveryFee' },
+    update: {},
+    create: {
+      key: 'deliveryFee',
+      value: '5',
+    },
+  });
+  console.log('Created default delivery fee setting');
+
   const categoriesData = [
     { name: 'Jackets' },
     { name: 'Sweaters' },

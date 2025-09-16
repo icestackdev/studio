@@ -1,3 +1,4 @@
+
 import { Prisma } from '@prisma/client';
 
 export type ProductImage = {
@@ -11,7 +12,7 @@ export type Product = {
   name: string;
   description: string;
   price: number;
-  images: { id: string; hint: string }[];
+  images: { id: string; url: string; hint: string }[];
   sizes: string[];
   category: string;
   categoryId: string;
@@ -36,6 +37,7 @@ export interface PreOrder {
   items: CartItem[];
   customer: CustomerInfo;
   total: number;
+  deliveryFee: number;
   date: Date;
   status: 'Pending' | 'Confirmed' | 'Shipped';
 }
