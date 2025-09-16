@@ -20,7 +20,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { getProducts, addProduct, updateProduct, deleteProduct } from '@/app/actions/product';
-import type { Product as PrismaProduct, Category } from '@prisma/client';
+import type { Category } from '@prisma/client';
 import { getCategories } from '@/app/actions/category';
 import { useToast } from '@/hooks/use-toast';
 
@@ -42,7 +42,7 @@ export default function ManageProductsPage() {
     setCategories(categories);
   }
 
-  const handleAddProduct = async (data: any) => {
+  const handleAddProduct = async (data: FormData) => {
     try {
       await addProduct(data);
       setIsAdding(false);
@@ -54,7 +54,7 @@ export default function ManageProductsPage() {
     }
   };
   
-  const handleEditProduct = async (data: any) => {
+  const handleEditProduct = async (data: FormData) => {
     if (!editingProduct) return;
     try {
       await updateProduct(editingProduct.id, data);

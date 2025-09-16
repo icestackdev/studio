@@ -12,6 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useState } from 'react';
 import Image from 'next/image';
 import type { Category } from '@prisma/client';
+import { Product } from '@/lib/types';
+import { X } from 'lucide-react';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -19,19 +21,21 @@ const formSchema = z.object({
   price: z.coerce.number().min(0.01, { message: "Price must be greater than 0." }),
   categoryId: z.string().min(1, { message: "Please select a category." }),
   sizes: z.string().min(1, { message: "Please enter at least one size, comma-separated." }),
-  images: z.string().optional().describe("Image URLs, comma-separated"),
+  images: z.any().optional().describe("Image files for upload"),
 });
 
 type ProductFormValues = z.infer<typeof formSchema>;
 
 interface ProductFormProps {
-  onSubmit: (data: ProductFormValues) => void;
+  onSubmit: (data: FormData) => void;
   onCancel: () => void;
-  initialData?: Partial<ProductFormValues & { category: string }>;
+  initialData?: Partial<Product>
   categories: Category[];
 }
 
 export function ProductForm({ onSubmit, onCancel, initialData, categories }: ProductFormProps) {
+  const [imagePreviews, setImagePreviews] = useState<string[]>(initialData?.images?.map(i => i.url) || []);
+  const [existingImages, setExistingImages] = useState<string[]>(initialData?.images?.map(i => i.url) || []);
   
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(formSchema),
@@ -41,25 +45,50 @@ export function ProductForm({ onSubmit, onCancel, initialData, categories }: Pro
         price: initialData.price,
         categoryId: initialData.categoryId,
         sizes: Array.isArray(initialData.sizes) ? initialData.sizes.join(', ') : '',
-        images: Array.isArray(initialData.images) ? initialData.images.map(i => i.url).join(', ') : '',
     } : {
       name: '',
       description: '',
       price: 0,
       categoryId: '',
       sizes: '',
-      images: '',
+      images: [],
     },
   });
 
-  const imagesValue = form.watch('images');
-  const imagePreviews = imagesValue ? imagesValue.split(',').map(url => url.trim()).filter(url => url) : [];
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const files = Array.from(e.target.files);
+      const newPreviews = files.map(file => URL.createObjectURL(file));
+      setImagePreviews(prev => [...prev, ...newPreviews]);
+    }
+  };
+  
+  const handleRemoveImage = (index: number, isExisting: boolean) => {
+    if (isExisting) {
+        setExistingImages(prev => prev.filter((_, i) => i !== index));
+    }
+    setImagePreviews(prev => prev.filter((_, i) => i !== index));
+  }
 
   const handleSubmit = (data: ProductFormValues) => {
-    onSubmit({
-        ...data,
-        sizes: data.sizes,
+    const formData = new FormData();
+    Object.entries(data).forEach(([key, value]) => {
+        if (key === 'images') {
+            if (data.images && data.images.length > 0) {
+                for (let i = 0; i < data.images.length; i++) {
+                    formData.append('images', data.images[i]);
+                }
+            }
+        } else if (value !== undefined && value !== null) {
+            formData.append(key, value.toString());
+        }
     });
+    
+    if (initialData) {
+        formData.append('existingImages', existingImages.join(','));
+    }
+
+    onSubmit(formData);
   };
 
   return (
@@ -147,7 +176,14 @@ export function ProductForm({ onSubmit, onCancel, initialData, categories }: Pro
             <FormItem>
               <FormLabel>Product Images</FormLabel>
                <FormControl>
-                <Textarea placeholder="Enter image URLs, separated by commas" {...field} />
+                <Input 
+                    type="file" 
+                    multiple 
+                    onChange={(e) => {
+                        field.onChange(e.target.files);
+                        handleImageChange(e);
+                    }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -157,11 +193,19 @@ export function ProductForm({ onSubmit, onCancel, initialData, categories }: Pro
         <div className="flex gap-4 mt-4 flex-wrap">
             {imagePreviews.map((preview, index) => (
                 preview && (
-                    <div key={index} className="mt-2">
-                        <FormLabel className="text-xs">Preview {index + 1}</FormLabel>
+                    <div key={index} className="relative mt-2">
                         <div className="mt-2 w-24 h-24 relative">
                             <Image src={preview} alt={`Image preview ${index + 1}`} layout="fill" objectFit="cover" className="rounded-md" />
                         </div>
+                        <Button
+                            type="button"
+                            variant="destructive"
+                            size="icon"
+                            className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                            onClick={() => handleRemoveImage(index, index < existingImages.length)}
+                        >
+                            <X className="h-4 w-4" />
+                        </Button>
                     </div>
                 )
             ))}

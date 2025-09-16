@@ -3,6 +3,7 @@
 
 import prisma from "@/lib/prisma"
 import { revalidatePath } from "next/cache";
+import { uploadImage } from "@/services/cloudinary";
 
 export async function getProducts() {
   const products = await prisma.product.findMany({
@@ -36,8 +37,21 @@ export async function getProduct(id: string) {
     };
 }
 
-export async function addProduct(data: any) {
-  const { name, description, price, categoryId, sizes, images } = data;
+export async function addProduct(formData: FormData) {
+  const name = formData.get('name') as string;
+  const description = formData.get('description') as string;
+  const price = parseFloat(formData.get('price') as string);
+  const categoryId = formData.get('categoryId') as string;
+  const sizes = (formData.get('sizes') as string).split(',').map((s: string) => s.trim());
+  const images = formData.getAll('images') as File[];
+
+  const imageUrls = await Promise.all(
+    images.map(async (image) => {
+        const buffer = Buffer.from(await image.arrayBuffer());
+        const result = await uploadImage(buffer);
+        return result.secure_url;
+    })
+  );
   
   const product = await prisma.product.create({
     data: {
@@ -45,9 +59,9 @@ export async function addProduct(data: any) {
       description,
       price,
       categoryId,
-      sizes: sizes.split(',').map((s: string) => s.trim()),
+      sizes,
       images: {
-        create: images.split(',').map((url: string) => ({ url: url.trim() })),
+        create: imageUrls.map((url: string) => ({ url })),
       },
     },
   });
@@ -57,8 +71,28 @@ export async function addProduct(data: any) {
   return product;
 }
 
-export async function updateProduct(id: string, data: any) {
-  const { name, description, price, categoryId, sizes, images } = data;
+export async function updateProduct(id: string, formData: FormData) {
+    const name = formData.get('name') as string;
+    const description = formData.get('description') as string;
+    const price = parseFloat(formData.get('price') as string);
+    const categoryId = formData.get('categoryId') as string;
+    const sizes = (formData.get('sizes') as string).split(',').map((s: string) => s.trim());
+    const images = formData.getAll('images') as File[];
+    const existingImageUrls = formData.get('existingImages') as string;
+
+    let imageUrls = existingImageUrls ? existingImageUrls.split(',') : [];
+
+    if (images && images.length > 0 && images[0].size > 0) {
+        const newImageUrls = await Promise.all(
+            images.map(async (image) => {
+                const buffer = Buffer.from(await image.arrayBuffer());
+                const result = await uploadImage(buffer);
+                return result.secure_url;
+            })
+        );
+        imageUrls = [...imageUrls, ...newImageUrls];
+    }
+
 
   const product = await prisma.product.update({
     where: { id },
@@ -67,16 +101,16 @@ export async function updateProduct(id: string, data: any) {
       description,
       price,
       categoryId,
-      sizes: sizes.split(',').map((s: string) => s.trim()),
+      sizes,
     },
   });
 
-  if (images) {
+  if (imageUrls) {
     // Delete old images
     await prisma.productImage.deleteMany({ where: { productId: id }});
     // Create new images
     await prisma.productImage.createMany({
-        data: images.split(',').map((url: string) => ({ url: url.trim(), productId: id })),
+        data: imageUrls.map((url: string) => ({ url: url.trim(), productId: id })),
     });
   }
 
