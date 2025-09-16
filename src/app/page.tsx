@@ -1,18 +1,20 @@
 
 "use client";
 
+import { useState } from 'react';
 import { ProductCard } from '@/components/product-card';
+import { ProductListItem } from '@/components/product-list-item';
 import { products, categories } from '@/lib/products';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, ShoppingBag } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { ArrowRight, LayoutGrid, List } from 'lucide-react';
 
 export default function HomePage() {
   const promoImage = PlaceHolderImages.find(img => img.id === 'promo-banner-1');
+  const [layout, setLayout] = useState<'grid' | 'list'>('grid');
 
   return (
     <motion.div
@@ -67,15 +69,48 @@ export default function HomePage() {
       <div>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold tracking-tight">New Arrivals</h2>
-          <Link href="/categories" className="text-sm font-medium text-primary hover:underline">
-            View All
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link href="/categories" className="text-sm font-medium text-primary hover:underline">
+              View All
+            </Link>
+            <div className="flex justify-end gap-1">
+                <Button variant={layout === 'grid' ? 'secondary' : 'ghost'} size="icon" className="h-8 w-8" onClick={() => setLayout('grid')}>
+                    <LayoutGrid className="h-5 w-5" />
+                </Button>
+                <Button variant={layout === 'list' ? 'secondary' : 'ghost'} size="icon" className="h-8 w-8" onClick={() => setLayout('list')}>
+                    <List className="h-5 w-5" />
+                </Button>
+            </div>
+          </div>
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          {products.slice(0, 4).map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+
+        {layout === 'grid' ? (
+          <div className="grid grid-cols-2 gap-4">
+            {products.slice(0, 4).map((product, index) => (
+              <motion.div
+                key={product.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+              >
+                <ProductCard product={product} />
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {products.slice(0, 4).map((product, index) => (
+              <motion.div
+                key={product.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+              >
+                <ProductListItem product={product} />
+              </motion.div>
+            ))}
+          </div>
+        )}
       </div>
     </motion.div>
   );
