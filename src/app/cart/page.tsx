@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Minus, Plus, Trash2, ShoppingBag, ImageIcon } from 'lucide-react';
 import { PreorderSheet } from '@/components/PreorderSheet';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function CartPage() {
@@ -40,7 +39,7 @@ export default function CartPage() {
           <div className="space-y-4">
             <AnimatePresence>
               {state.cartItems.map(item => {
-                  const image = PlaceHolderImages.find(img => img.id === item.product.images[0]?.id);
+                  const image = item.product.images[0];
                   return (
                     <motion.div
                       key={item.id}
@@ -53,7 +52,7 @@ export default function CartPage() {
                         <CardContent className="p-4 flex gap-4">
                             <div className="w-24 h-32 bg-muted rounded-md flex items-center justify-center shrink-0">
                               {image ? (
-                                <Image src={image.imageUrl} alt={item.product.name} width={96} height={128} className="rounded-md object-cover w-full h-full" data-ai-hint={image.imageHint} />
+                                <Image src={image.url} alt={item.product.name} width={96} height={128} className="rounded-md object-cover w-full h-full" data-ai-hint={image.hint} />
                               ) : (
                                 <ImageIcon className="w-8 h-8 text-muted-foreground" />
                               )}
