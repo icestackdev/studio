@@ -18,6 +18,7 @@ import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { getOrders } from '@/app/actions/order';
 import type { Order, OrderItem, Product as PrismaProduct, Category } from '@prisma/client';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type OrderWithItems = Order & { items: (OrderItem & { product: PrismaProduct })[] };
 
@@ -29,6 +30,7 @@ export default function ProfilePage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [shopName, setShopName] = useState(state.shopName);
   const [myOrders, setMyOrders] = useState<any[]>([]);
+  const [isLoadingOrders, setIsLoadingOrders] = useState(true);
 
   
   useEffect(() => {
@@ -46,8 +48,10 @@ export default function ProfilePage() {
     // This is a simple mock of fetching orders for the current user.
     // In a real app, you would filter orders by user ID.
     const fetchMyOrders = async () => {
+        setIsLoadingOrders(true);
         const allOrders = await getOrders();
         setMyOrders(allOrders);
+        setIsLoadingOrders(false);
     };
     fetchMyOrders();
   }, []);
@@ -143,7 +147,12 @@ export default function ProfilePage() {
 
       <div>
         <h2 className="text-base font-semibold mb-4">My Pre-orders</h2>
-        {reversedOrders.length === 0 ? (
+        {isLoadingOrders ? (
+           <div className="space-y-4">
+                <Skeleton className="h-32 w-full rounded-lg" />
+                <Skeleton className="h-32 w-full rounded-lg" />
+            </div>
+        ) : reversedOrders.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground">
             <ShoppingBag className="mx-auto h-12 w-12" />
             <p className="mt-4 text-sm">You have no pre-orders yet.</p>

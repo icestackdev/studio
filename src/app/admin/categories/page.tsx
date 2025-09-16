@@ -22,6 +22,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { addCategory, deleteCategory, getCategories, updateCategory } from '@/app/actions/category';
 import type { Category } from '@prisma/client';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function ManageCategoriesPage() {
   const router = useRouter();
@@ -30,14 +31,17 @@ export default function ManageCategoriesPage() {
   const [newCategory, setNewCategory] = useState('');
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [editedName, setEditedName] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetchCategories();
   }, []);
 
   const fetchCategories = async () => {
+    setIsLoading(true);
     const fetchedCategories = await getCategories();
     setCategories(fetchedCategories);
+    setIsLoading(false);
   };
 
   const handleAddCategory = async () => {
@@ -172,7 +176,13 @@ export default function ManageCategoriesPage() {
           <CardTitle className="text-base">Existing Categories</CardTitle>
         </CardHeader>
         <CardContent>
-          {categories.length === 0 ? (
+          {isLoading ? (
+             <div className="space-y-2">
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-12 w-full" />
+            </div>
+          ) : categories.length === 0 ? (
             <p className="text-sm text-muted-foreground">No categories found.</p>
           ) : (
             <ul className="space-y-2">
