@@ -1,6 +1,6 @@
 
 import { Skeleton } from "@/components/ui/skeleton";
-import { Circle, Home, LayoutGrid, ShoppingCart, User } from "lucide-react";
+import { Home, LayoutGrid, ShoppingCart, User } from "lucide-react";
 
 export function AppSkeleton() {
   return (
@@ -20,7 +20,10 @@ export function AppSkeleton() {
         <div className="space-y-4">
             <div className="flex justify-between items-center">
                 <Skeleton className="h-6 w-32" />
-                <Skeleton className="h-6 w-20" />
+                <div className="flex gap-2">
+                    <Skeleton className="h-8 w-8" />
+                    <Skeleton className="h-8 w-8" />
+                </div>
             </div>
             <div className="space-y-4">
                 {[...Array(2)].map((_, i) => (
@@ -29,9 +32,9 @@ export function AppSkeleton() {
                         <div className="flex-1 space-y-2">
                             <Skeleton className="h-5 w-4/5" />
                             <Skeleton className="h-4 w-1/4" />
-                            <Skeleton className="h-6 w-1/3" />
+                            <Skeleton className="h-6 w-1/3 mt-2" />
                         </div>
-                        <Skeleton className="h-5 w-5 rounded-full" />
+                        <Skeleton className="h-5 w-5" />
                     </div>
                 ))}
             </div>
@@ -41,8 +44,8 @@ export function AppSkeleton() {
       {/* Skeleton Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 h-16 bg-background/95 backdrop-blur-sm border-t z-40 max-w-lg mx-auto">
         <div className="grid grid-cols-4 h-full">
-          {[Home, LayoutGrid, ShoppingCart, User].map((Icon, i) => (
-            <div key={i} className="flex flex-col items-center justify-center gap-1">
+          {['Home', 'Categories', 'Cart', 'Profile'].map((label, i) => (
+            <div key={i} className="flex flex-col items-center justify-center gap-1 text-muted-foreground">
               <Skeleton className="h-5 w-5 rounded-md" />
               <Skeleton className="h-3 w-10" />
             </div>
