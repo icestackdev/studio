@@ -4,8 +4,6 @@ import { Inter } from 'next/font/google';
 import { Toaster } from '@/components/ui/toaster';
 import { CartProvider } from '@/contexts/CartProvider';
 import { TelegramProvider } from '@/components/TelegramProvider';
-import { Header } from '@/components/Header';
-import { BottomNav } from '@/components/BottomNav';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
@@ -27,13 +25,7 @@ export default function RootLayout({
       <body className={`${inter.variable} font-sans antialiased`}>
         <TelegramProvider>
           <CartProvider>
-            <div className="relative max-w-lg mx-auto bg-background min-h-screen flex flex-col">
-              <Header />
-              <main className="flex-1 pt-20 pb-20 px-4">
-                {children}
-              </main>
-              <BottomNav />
-            </div>
+            {children}
             <Toaster />
           </CartProvider>
         </TelegramProvider>
