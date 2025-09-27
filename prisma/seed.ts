@@ -135,7 +135,7 @@ async function main() {
         description: p.description,
         price: p.price,
         categoryId: p.category.id,
-        sizes: p.sizes,
+        sizes: p.sizes.join(','),
         images: {
           create: p.imageIds
             .map(id => placeholderData.placeholderImages.find(img => img.id === id))

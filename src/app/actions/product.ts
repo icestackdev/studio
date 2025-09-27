@@ -19,6 +19,7 @@ export async function getProducts({ page = 1, limit = 10 }: { page?: number, lim
   });
   return products.map(p => ({
     ...p,
+    sizes: p.sizes.split(',').map(s => s.trim()),
     category: p.category.name,
     images: p.images.map(i => ({ id: i.id, url: i.url, hint: p.name.toLowerCase() })),
   }));
@@ -37,6 +38,7 @@ export async function getProduct(id: string) {
 
     return {
         ...product,
+        sizes: product.sizes.split(',').map(s => s.trim()),
         category: product.category.name,
         images: product.images.map(i => ({ id: i.id, url: i.url, hint: product.name.toLowerCase() })),
     };
@@ -47,7 +49,7 @@ export async function addProduct(formData: FormData) {
   const description = formData.get('description') as string;
   const price = parseFloat(formData.get('price') as string);
   const categoryId = formData.get('categoryId') as string;
-  const sizes = (formData.get('sizes') as string).split(',').map((s: string) => s.trim());
+  const sizes = formData.get('sizes') as string;
   const images = formData.getAll('images') as File[];
 
   const imageUrls = await Promise.all(
@@ -81,7 +83,7 @@ export async function updateProduct(id: string, formData: FormData) {
     const description = formData.get('description') as string;
     const price = parseFloat(formData.get('price') as string);
     const categoryId = formData.get('categoryId') as string;
-    const sizes = (formData.get('sizes') as string).split(',').map((s: string) => s.trim());
+    const sizes = formData.get('sizes') as string;
     const images = formData.getAll('images') as File[];
     const existingImageUrls = formData.get('existingImages') as string;
 

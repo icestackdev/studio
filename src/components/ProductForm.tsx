@@ -31,7 +31,7 @@ type ProductFormValues = z.infer<typeof formSchema>;
 interface ProductFormProps {
   onSubmit: (data: FormData) => void;
   onCancel: () => void;
-  initialData?: Partial<Product> & { sizes: string | string[] };
+  initialData?: Partial<Product>;
   categories: Category[];
 }
 
@@ -48,7 +48,7 @@ export function ProductForm({ onSubmit, onCancel, initialData, categories }: Pro
     resolver: zodResolver(formSchema),
     defaultValues: initialData ? {
         ...initialData,
-        sizes: Array.isArray(initialData.sizes) ? initialData.sizes.join(', ') : initialData.sizes,
+        sizes: Array.isArray(initialData.sizes) ? initialData.sizes.join(', ') : '',
     } : {
       name: '',
       description: '',
