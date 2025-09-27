@@ -1,11 +1,13 @@
+datasource db {
+  provider     = "postgresql"
+  url          = env("DATABASE_URL")
+  directUrl    = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["driverAdapters"]
-}
-
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model Product {
@@ -17,9 +19,11 @@ model Product {
   sizes       String
   category    Category       @relation(fields: [categoryId], references: [id])
   categoryId  String
+  orderItems  OrderItem[]
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
-  OrderItem   OrderItem[]
+
+  @@map("products")
 }
 
 model Category {
@@ -28,14 +32,8 @@ model Category {
   products  Product[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-}
 
-model ProductImage {
-  id        String   @id @default(cuid())
-  url       String
-  product   Product  @relation(fields: [productId], references: [id])
-  productId String
-  createdAt DateTime @default(now())
+  @@map("categories")
 }
 
 model Order {
@@ -47,9 +45,11 @@ model Order {
   items           OrderItem[]
   total           Float
   deliveryFee     Float
-  status          String      @default("Pending")
+  status          String
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
+
+  @@map("orders")
 }
 
 model OrderItem {
@@ -62,6 +62,20 @@ model OrderItem {
   size      String
   price     Float
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("order_items")
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  url       String
+  product   Product  @relation(fields: [productId], references: [id])
+  productId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("product_images")
 }
 
 model Settings {
@@ -70,4 +84,6 @@ model Settings {
   value     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("settings")
 }
