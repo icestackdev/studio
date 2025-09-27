@@ -5,13 +5,11 @@ import React, { createContext, useReducer, useContext, ReactNode, useEffect, use
 import type { CartItem, PreOrder, Product } from '@/lib/types';
 import { getCategories } from '@/app/actions/category';
 import { getProducts } from '@/app/actions/product';
-import { getOrders } from '@/app/actions/order';
 import { getSetting, updateSetting } from '@/app/actions/setting';
 import { AppSkeleton } from '@/components/AppSkeleton';
 
 interface CartState {
   cartItems: CartItem[];
-  preOrders: PreOrder[];
   shopName: string;
   deliveryFee: number;
   categories: string[];
@@ -22,16 +20,14 @@ type CartAction =
   | { type: 'ADD_TO_CART'; payload: { product: Product; size: string; quantity: number } }
   | { type: 'REMOVE_FROM_CART'; payload: { cartItemId: string } }
   | { type: 'UPDATE_QUANTITY'; payload: { cartItemId: string; quantity: number } }
-  | { type: 'CONFIRM_PRE_ORDER'; payload: { customer: PreOrder['customer'], total: number } }
   | { type: 'CLEAR_CART' }
   | { type: 'SET_SHOP_NAME'; payload: string }
   | { type: 'SET_DELIVERY_FEE'; payload: number }
-  | { type: 'SET_INITIAL_DATA'; payload: { products: Product[], categories: string[], orders: PreOrder[], shopName: string, deliveryFee: number } };
+  | { type: 'SET_INITIAL_DATA'; payload: { products: Product[], categories: string[], shopName: string, deliveryFee: number } };
 
 
 const initialState: CartState = {
   cartItems: [],
-  preOrders: [],
   shopName: 'ThreadLine',
   deliveryFee: 0,
   categories: [],
@@ -52,7 +48,6 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
             ...state,
             products: action.payload.products,
             categories: action.payload.categories,
-            preOrders: action.payload.orders,
             shopName: action.payload.shopName,
             deliveryFee: action.payload.deliveryFee,
         };
@@ -98,25 +93,6 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
             cartItems: [],
         };
     }
-    case 'CONFIRM_PRE_ORDER': {
-      if (state.cartItems.length === 0) return state;
-
-      const newPreOrder: PreOrder = {
-        id: `PO-${Date.now()}`,
-        items: [...state.cartItems],
-        customer: action.payload.customer,
-        date: new Date(),
-        status: 'Pending',
-        total: action.payload.total,
-        deliveryFee: state.deliveryFee,
-      };
-
-      return {
-        ...state,
-        cartItems: [],
-        preOrders: [...state.preOrders, newPreOrder],
-      };
-    }
     case 'SET_SHOP_NAME': {
         return {
             ...state,
@@ -141,17 +117,15 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     async function fetchData() {
         try {
-            const [products, categories, orders, shopNameSetting, deliveryFeeSetting] = await Promise.all([
+            const [products, categories, shopNameSetting, deliveryFeeSetting] = await Promise.all([
                 getProducts(),
                 getCategories(),
-                getOrders(),
                 getSetting('shopName'),
                 getSetting('deliveryFee'),
             ]);
             dispatch({ type: 'SET_INITIAL_DATA', payload: { 
                 products, 
                 categories: categories.map(c => c.name),
-                orders: orders as PreOrder[],
                 shopName: shopNameSetting?.value || 'ThreadLine',
                 deliveryFee: deliveryFeeSetting?.value ? parseFloat(deliveryFeeSetting.value) : 5,
             } });

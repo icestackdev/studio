@@ -73,5 +73,5 @@ export function useInfiniteScroll<T>({
     }
   }, []);
 
-  return { items, lastItemRef, hasMore, isLoading, reset };
+  return { items, setItems, lastItemRef, hasMore, isLoading, reset };
 }

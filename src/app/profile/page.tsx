@@ -51,6 +51,11 @@ export default function ProfilePage() {
     }
   }, [webApp]);
 
+  useEffect(() => {
+    setShopName(state.shopName);
+    setDeliveryFee(state.deliveryFee.toString());
+  }, [state.shopName, state.deliveryFee]);
+
   const handleSaveShopName = async () => {
     try {
       await updateShopName(shopName);

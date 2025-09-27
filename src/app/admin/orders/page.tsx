@@ -29,6 +29,7 @@ export default function ManageOrdersPage() {
     hasMore,
     isLoading,
     lastItemRef,
+    setItems,
   } = useInfiniteScroll({
     fetchFunction: getOrders as any,
     limit: 5,
@@ -61,7 +62,12 @@ export default function ManageOrdersPage() {
         title: 'Order Status Updated',
         description: `Order ${orderId} has been updated to ${status}.`
       });
-      // We might need to refetch or update the state here. For now, user can refresh.
+      // Update the status locally to avoid a full refetch
+      setItems(prevOrders => 
+        prevOrders.map(order => 
+          order.id === orderId ? { ...order, status } : order
+        ) as any
+      );
     } catch (error) {
       toast({
         variant: 'destructive',
