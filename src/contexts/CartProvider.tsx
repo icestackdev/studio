@@ -2,10 +2,8 @@
 "use client";
 
 import React, { createContext, useReducer, useContext, ReactNode, useEffect, useState } from 'react';
-import type { CartItem, PreOrder, Product } from '@/lib/types';
-import { getCategories } from '@/app/actions/category';
-import { getProducts } from '@/app/actions/product';
-import { getSetting, updateSetting } from '@/app/actions/setting';
+import type { CartItem, Product } from '@/lib/types';
+import { updateSetting } from '@/app/actions/setting';
 import { AppSkeleton } from '@/components/AppSkeleton';
 
 interface CartState {
@@ -23,7 +21,7 @@ type CartAction =
   | { type: 'CLEAR_CART' }
   | { type: 'SET_SHOP_NAME'; payload: string }
   | { type: 'SET_DELIVERY_FEE'; payload: number }
-  | { type: 'SET_INITIAL_DATA'; payload: { products: Product[], categories: string[], shopName: string, deliveryFee: number } };
+  | { type: 'SET_INITIAL_DATA'; payload: CartState };
 
 
 const initialState: CartState = {
@@ -44,13 +42,7 @@ const CartContext = createContext<{
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
     case 'SET_INITIAL_DATA':
-        return {
-            ...state,
-            products: action.payload.products,
-            categories: action.payload.categories,
-            shopName: action.payload.shopName,
-            deliveryFee: action.payload.deliveryFee,
-        };
+        return action.payload;
     case 'ADD_TO_CART': {
       const { product, size, quantity } = action.payload;
       const existingItemIndex = state.cartItems.findIndex(
@@ -110,32 +102,18 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
   }
 };
 
-export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [state, dispatch] = useReducer(cartReducer, initialState);
-  const [loading, setLoading] = useState(true);
+interface CartProviderProps {
+    children: ReactNode;
+    initialData: Omit<CartState, 'cartItems'>;
+}
+
+
+export const CartProvider = ({ children, initialData }: CartProviderProps) => {
+  const [state, dispatch] = useReducer(cartReducer, { ...initialData, cartItems: [] });
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    async function fetchData() {
-        try {
-            const [products, categories, shopNameSetting, deliveryFeeSetting] = await Promise.all([
-                getProducts(),
-                getCategories(),
-                getSetting('shopName'),
-                getSetting('deliveryFee'),
-            ]);
-            dispatch({ type: 'SET_INITIAL_DATA', payload: { 
-                products, 
-                categories: categories.map(c => c.name),
-                shopName: shopNameSetting?.value || 'ThreadLine',
-                deliveryFee: deliveryFeeSetting?.value ? parseFloat(deliveryFeeSetting.value) : 5,
-            } });
-        } catch (error) {
-            console.error("Failed to fetch initial data", error);
-        } finally {
-            setLoading(false);
-        }
-    }
-    fetchData();
+    setIsMounted(true);
   }, []);
 
   const updateShopName = async (newName: string) => {
@@ -148,7 +126,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     dispatch({ type: 'SET_DELIVERY_FEE', payload: newFee });
   };
 
-  if (loading) {
+  if (!isMounted) {
     return <AppSkeleton />;
   }
 

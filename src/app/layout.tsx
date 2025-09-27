@@ -6,6 +6,9 @@ import { CartProvider } from '@/contexts/CartProvider';
 import { TelegramProvider } from '@/components/TelegramProvider';
 import { Header } from '@/components/Header';
 import { BottomNav } from '@/components/BottomNav';
+import { getProducts } from './actions/product';
+import { getCategories } from './actions/category';
+import { getSetting } from './actions/setting';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
@@ -14,11 +17,26 @@ export const metadata: Metadata = {
   description: 'Exclusive clothing pre-orders on Telegram.',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Fetch initial data on the server
+  const [products, categories, shopNameSetting, deliveryFeeSetting] = await Promise.all([
+      getProducts({limit: 100}), // Fetch a larger number for initial state
+      getCategories(),
+      getSetting('shopName'),
+      getSetting('deliveryFee'),
+  ]);
+
+  const initialData = {
+      products,
+      categories: categories.map(c => c.name),
+      shopName: shopNameSetting?.value || 'ThreadLine',
+      deliveryFee: deliveryFeeSetting?.value ? parseFloat(deliveryFeeSetting.value) : 5,
+  };
+
   return (
     <html lang="en">
       <head>
@@ -26,7 +44,7 @@ export default function RootLayout({
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
         <TelegramProvider>
-          <CartProvider>
+          <CartProvider initialData={initialData}>
             <div className="relative max-w-lg mx-auto bg-background min-h-screen flex flex-col">
               <Header />
               <main className="flex-1 pt-24 pb-24 px-4">

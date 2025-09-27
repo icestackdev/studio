@@ -1,12 +1,12 @@
 
 datasource db {
-  provider     = "postgresql"
-  url          = env("DATABASE_URL")
-  relationMode = "prisma"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider     = "prisma-client-js"
+  engineType   = "dataproxy"
 }
 
 model Settings {
@@ -18,7 +18,7 @@ model Settings {
 model Product {
   id          String         @id @default(cuid())
   name        String         @unique
-  description String         @db.Text
+  description String
   price       Float
   images      ProductImage[]
   sizes       String
@@ -27,17 +27,6 @@ model Product {
   orderItems  OrderItem[]
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
-
-  @@index([categoryId])
-}
-
-model ProductImage {
-  id        String  @id @default(cuid())
-  url       String
-  product   Product @relation(fields: [productId], references: [id])
-  productId String
-
-  @@index([productId])
 }
 
 model Category {
@@ -46,16 +35,23 @@ model Category {
   products Product[]
 }
 
+model ProductImage {
+  id        String  @id @default(cuid())
+  url       String
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+}
+
 model Order {
   id              String      @id @default(cuid())
   customerName    String
   customerPhone   String
   customerAddress String
   customerNotes   String?
-  items           OrderItem[]
   total           Float
   deliveryFee     Float
-  status          String
+  status          String      @default("Pending") // e.g., Pending, Confirmed, Shipped
+  items           OrderItem[]
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 }
@@ -68,8 +64,5 @@ model OrderItem {
   productId String
   quantity  Int
   size      String
-  price     Float
-
-  @@index([orderId])
-  @@index([productId])
+  price     Float // Price at the time of order
 }
