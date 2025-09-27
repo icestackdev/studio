@@ -22,7 +22,9 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   const product = state.products.find(p => p.id === params.id);
 
   if (!product) {
-    notFound();
+    // This needs to be handled better in a real app, maybe redirect or show a not found component
+    // For now, returning null or a simple message. `notFound()` can't be used in client components directly.
+    return <div>Product not found</div>;
   }
 
   const handleAddToCart = () => {
@@ -49,7 +51,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="pb-24 bg-background min-h-screen"
+      className="pb-24 bg-background"
     >
         <div className="fixed top-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-sm z-20 max-w-lg mx-auto flex items-center justify-between">
             <Button 

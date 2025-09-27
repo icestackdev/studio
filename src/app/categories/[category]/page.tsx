@@ -5,37 +5,43 @@ import { ProductCard } from '@/components/product-card';
 import { ProductListItem } from '@/components/product-list-item';
 import { useCart } from '@/contexts/CartProvider';
 import { motion } from 'framer-motion';
-import { notFound, useParams } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { useMemo, useState, useEffect } from 'react';
 import { ArrowLeft, LayoutGrid, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
 
 export default function CategoryProductsPage() {
   const router = useRouter();
   const params = useParams();
   const { state } = useCart();
-  const { products } = state;
+  const { products, categories } = state;
   const { category: categorySlug } = params;
   const [layout, setLayout] = useState<'grid' | 'list'>('grid');
+  const [categoryName, setCategoryName] = useState<string | null>(null);
 
-  const categoryName = useMemo(() => {
-    if (typeof categorySlug !== 'string') return null;
-    const name = decodeURIComponent(categorySlug.replace('-', ' '));
-    // Find the category in the state to get the correct capitalization
-    return state.categories.find(c => c.toLowerCase() === name.toLowerCase()) || null;
-  }, [categorySlug, state.categories]);
+  useEffect(() => {
+    if (typeof categorySlug === 'string') {
+        const decodedSlug = decodeURIComponent(categorySlug.replace('-', ' '));
+        const foundCategory = categories.find(c => c.toLowerCase() === decodedSlug.toLowerCase());
+        setCategoryName(foundCategory || null);
+    }
+  }, [categorySlug, categories]);
 
   const categoryProducts = useMemo(
-    () =>
-      products.filter(
-        (p) => p.category.toLowerCase() === (categoryName || '').toLowerCase()
-      ),
+    () => {
+        if (!categoryName) return [];
+        return products.filter(
+            (p) => p.category.toLowerCase() === categoryName.toLowerCase()
+        )
+    },
     [categoryName, products]
   );
-
-  if (!categoryName || categoryProducts.length === 0) {
-    notFound();
+  
+  // This handles the case where the slug is invalid or products are not loaded yet
+  if (categoryName === null && !products.length) {
+    // Maybe show a loading indicator or a not found message
+    // returning null for now
+    return null;
   }
 
   return (
