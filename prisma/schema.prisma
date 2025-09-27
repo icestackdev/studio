@@ -1,13 +1,33 @@
+
 datasource db {
-  provider     = "postgresql"
-  url          = env("DATABASE_URL")
-  directUrl    = env("DATABASE_URL")
-  relationMode = "prisma"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["driverAdapters"]
+  engineType      = "dataproxy"
+}
+
+model Settings {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("settings")
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@map("categories")
 }
 
 model Product {
@@ -15,25 +35,26 @@ model Product {
   name        String         @unique
   description String
   price       Float
-  images      ProductImage[]
   sizes       String
+  images      ProductImage[]
+  categoryId  String         @map("category_id")
   category    Category       @relation(fields: [categoryId], references: [id])
-  categoryId  String
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
   orderItems  OrderItem[]
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
 
   @@map("products")
 }
 
-model Category {
-  id        String    @id @default(cuid())
-  name      String    @unique
-  products  Product[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+model ProductImage {
+  id        String   @id @default(cuid())
+  url       String
+  productId String   @map("product_id")
+  product   Product  @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@map("categories")
+  @@map("product_images")
 }
 
 model Order {
@@ -42,48 +63,27 @@ model Order {
   customerPhone   String
   customerAddress String
   customerNotes   String?
-  items           OrderItem[]
   total           Float
   deliveryFee     Float
   status          String
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  items           OrderItem[]
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
 
   @@map("orders")
 }
 
 model OrderItem {
   id        String   @id @default(cuid())
-  order     Order    @relation(fields: [orderId], references: [id])
-  orderId   String
-  product   Product  @relation(fields: [productId], references: [id])
-  productId String
   quantity  Int
   size      String
   price     Float
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  orderId   String   @map("order_id")
+  order     Order    @relation(fields: [orderId], references: [id])
+  productId String   @map("product_id")
+  product   Product  @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("order_items")
-}
-
-model ProductImage {
-  id        String   @id @default(cuid())
-  url       String
-  product   Product  @relation(fields: [productId], references: [id])
-  productId String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("product_images")
-}
-
-model Settings {
-  id        String   @id @default(cuid())
-  key       String   @unique
-  value     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("settings")
 }
