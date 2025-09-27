@@ -75,6 +75,7 @@ export async function getOrders({ page = 1, limit = 10 }: { page?: number, limit
             price: item.price,
             product: {
                 ...item.product,
+                sizes: item.product.sizes.split(',').map(s => s.trim()),
                 category: item.product.category.name,
                 images: item.product.images.map(i => ({ id: i.id, url: i.url, hint: item.product.name.toLowerCase() })),
             }
@@ -91,4 +92,3 @@ export async function updateOrderStatus(orderId: string, status: Order['status']
     revalidatePath('/profile');
     return order;
 }
-
